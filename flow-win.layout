@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Windows Release" />
+	<File name="Effects.h" open="1" top="0" tabpos="8">
+		<Cursor position="15" topLine="8" />
+	</File>
+	<File name="Level.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="190" topLine="0" />
+	</File>
+	<File name="Level.h" open="1" top="0" tabpos="7">
+		<Cursor position="607" topLine="1" />
+	</File>
+	<File name="Piece.cpp" open="1" top="1" tabpos="4">
+		<Cursor position="237" topLine="0" />
+	</File>
+	<File name="Piece.h" open="1" top="0" tabpos="5">
+		<Cursor position="53" topLine="0" />
+	</File>
+	<File name="TextFile.h" open="0" top="0" tabpos="0">
+		<Cursor position="1924" topLine="0" />
+	</File>
+	<File name="TextFileManager.h" open="0" top="0" tabpos="0">
+		<Cursor position="790" topLine="0" />
+	</File>
+	<File name="TextFileSerializer.h" open="0" top="0" tabpos="0">
+		<Cursor position="454" topLine="0" />
+	</File>
+	<File name="World.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="91" topLine="0" />
+	</File>
+	<File name="World.h" open="1" top="0" tabpos="1">
+		<Cursor position="776" topLine="15" />
+	</File>
+	<File name="main.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="428" topLine="246" />
+	</File>
+</CodeBlocks_layout_file>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Windows Build" />
+	<File name="AdvancedOgreFramework.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="1384" topLine="51" />
+	</File>
+	<File name="AppStateManager.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="233" topLine="21" />
+	</File>
+</CodeBlocks_layout_file>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Flow" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Linux Build">
+				<Option platforms="Unix;Mac;" />
+				<Option output="./flow-linux" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="/home/fish/Flow/ogre/Samples/Common/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="`pkg-config --libs OGRE`" />
+					<Add library="OgreMain" />
+					<Add library="OIS" />
+					<Add library="GL" />
+					<Add directory="/home/fish/Flow/ogre/Samples/Common/include" />
+					<Add directory="/bin/Debug" />
+					<Add directory="/bin/Release" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="`pkg-config --cflags OGRE`" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="Effects.h" />
+		<Unit filename="Level.cpp" />
+		<Unit filename="Level.h" />
+		<Unit filename="Piece.cpp" />
+		<Unit filename="Piece.h" />
+		<Unit filename="TextFile.cpp" />
+		<Unit filename="TextFile.h" />
+		<Unit filename="TextFileManager.cpp" />
+		<Unit filename="TextFileManager.h" />
+		<Unit filename="TextFileSerializer.cpp" />
+		<Unit filename="TextFileSerializer.h" />
+		<Unit filename="World.cpp" />
+		<Unit filename="World.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
