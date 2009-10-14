@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Flow" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Linux Build">
+				<Option platforms="Unix;Mac;" />
+				<Option output=".\flow" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\flow-linux\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="`pkg-config --cflags OGRE`" />
+					<Add option="-fexceptions" />
+					<Add directory="\home\fish\Flow\ogre\Samples\Common\include" />
+					<Add directory="\usr\include\CEGUI" />
+					<Add directory="\usr\local\include\OGRE" />
+					<Add directory="\usr\include\OIS" />
+					<Add directory="\usr\include\tinyxml" />
+				</Compiler>
+				<Linker>
+					<Add library="CEGUIOgreRenderer" />
+					<Add directory="\bin\Debug" />
+					<Add directory="\bin\Release" />
+					<Add directory="\usr\local\include" />
+				</Linker>
+			</Target>
+			<Target title="Windows Build">
+				<Option platforms="Windows;" />
+				<Option output="H:\Build\Flow" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="H:\Build" />
+				<Option object_output="obj\flow-win\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-mthreads" />
+					<Add option="-fmessage-length=0" />
+					<Add option="-fexceptions" />
+					<Add option="-fident" />
+					<Add option="-DWIN32" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-DNDEBUG" />
+					<Add directory="H:\App\bullet-2.74\src" />
+					<Add directory="H:\App\OgreSDK\include" />
+					<Add directory="H:\App\OgreSDK\samples\include" />
+					<Add directory="H:\App\OgreSDK\samples\refapp\include" />
+					<Add directory="H:\App\OgreSDK\include\CEGUI" />
+					<Add directory="H:\App\OgreSDK\include\OIS" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--enable-runtime-pseudo-reloc" />
+					<Add option="-Wl,--enable-auto-image-base" />
+					<Add option="-Wl,--add-stdcall-alias" />
+					<Add library="OgreGUIRenderer" />
+					<Add directory="H:\App\OgreSDK\lib" />
+					<Add directory="H:\App\OgreSDK\bin\Debug" />
+					<Add directory="H:\App\OgreSDK\bin\Release" />
+					<Add directory="H:\App\bullet-2.74\out\release8\libs" />
+				</Linker>
+			</Target>
+		</Build>
+		<Linker>
+			<Add library="bulletdynamics" />
+			<Add library="GIMPACTUtils" />
+			<Add library="bulletcollision" />
+			<Add library="bulletmath" />
+			<Add library="OgreMain" />
+			<Add library="OIS" />
+			<Add library="CEGUIBase" />
+		</Linker>
+		<Unit filename="AdvancedOgreFramework.cpp" />
+		<Unit filename="AdvancedOgreFramework.hpp" />
+		<Unit filename="AppState.hpp" />
+		<Unit filename="AppStateManager.cpp" />
+		<Unit filename="AppStateManager.hpp" />
+		<Unit filename="DemoApp.cpp" />
+		<Unit filename="DemoApp.hpp" />
+		<Unit filename="DotSceneLoader.cpp" />
+		<Unit filename="DotSceneLoader.hpp" />
+		<Unit filename="Doxyfile" />
+		<Unit filename="GameState.cpp" />
+		<Unit filename="GameState.hpp" />
+		<Unit filename="MenuState.cpp" />
+		<Unit filename="MenuState.hpp" />
+		<Unit filename="main.cpp" />
+		<Unit filename="tinyxml\tinystr.cpp" />
+		<Unit filename="tinyxml\tinystr.h" />
+		<Unit filename="tinyxml\tinyxml.cpp" />
+		<Unit filename="tinyxml\tinyxml.h" />
+		<Unit filename="tinyxml\tinyxmlerror.cpp" />
+		<Unit filename="tinyxml\tinyxmlparser.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
