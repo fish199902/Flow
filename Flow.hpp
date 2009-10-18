@@ -9,7 +9,7 @@
 #include "AppStateManager.hpp"
 
 /// \todo Create necessary game states
-#include "states/MainMenu.hpp"
+#include "states/MenuState.hpp"
 #include "states/GameState.hpp"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

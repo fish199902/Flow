@@ -90,8 +90,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="states/GameState.cpp" />
 		<Unit filename="states/GameState.hpp" />
-		<Unit filename="states/MainMenu.cpp" />
-		<Unit filename="states/MainMenu.hpp" />
+		<Unit filename="states/MenuState.cpp" />
+		<Unit filename="states/MenuState.hpp" />
 		<Unit filename="tinyxml/tinystr.cpp" />
 		<Unit filename="tinyxml/tinystr.h" />
 		<Unit filename="tinyxml/tinyxml.cpp" />
