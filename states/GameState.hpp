@@ -1,13 +1,13 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#ifndef PLAY_STATE_HPP
-#define PLAY_STATE_HPP
+#ifndef GAME_STATE_HPP
+#define GAME_STATE_HPP
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "AppState.hpp"
+#include "../AppState.hpp"
 
-#include "DotSceneLoader.hpp"
+#include "../DotSceneLoader.hpp"
 
 #include <OgreSubEntity.h>
 #include <OgreMaterialManager.h>

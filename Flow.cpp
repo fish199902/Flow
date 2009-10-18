@@ -31,7 +31,7 @@ void Flow::startFlow()
 
     /// \todo Create necessary game states
 
-	MenuState::create(m_pAppStateManager, "MenuState");
+	MainMenu::create(m_pAppStateManager, "MainMenu");
 	GameState::create(m_pAppStateManager, "GameState");
 
 	m_pAppStateManager->start(m_pAppStateManager->findByName("MenuState"));
