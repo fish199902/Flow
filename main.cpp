@@ -1,6 +1,6 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "DemoApp.hpp"
+#include "Flow.hpp"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -17,8 +17,8 @@ int main(int argc, char **argv)
 {
 	try
       {
-		DemoApp demo;
-		demo.startDemo();
+		Flow mainGame;
+		mainGame.startFlow();
       }
 	catch(std::exception& e)
       {

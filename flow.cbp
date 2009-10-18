@@ -8,32 +8,34 @@
 		<Build>
 			<Target title="Linux Build">
 				<Option platforms="Unix;Mac;" />
-				<Option output=".\flow" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\flow-linux\" />
+				<Option output="./flow" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/flow-linux/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-Wall" />
+					<Add option="-g" />
 					<Add option="`pkg-config --cflags OGRE`" />
 					<Add option="-fexceptions" />
-					<Add directory="\home\fish\Flow\ogre\Samples\Common\include" />
-					<Add directory="\usr\include\CEGUI" />
-					<Add directory="\usr\local\include\OGRE" />
-					<Add directory="\usr\include\OIS" />
-					<Add directory="\usr\include\tinyxml" />
+					<Add directory="/home/fish/Flow/ogre/Samples/Common/include" />
+					<Add directory="/usr/include/CEGUI" />
+					<Add directory="/usr/local/include/OGRE" />
+					<Add directory="/usr/include/OIS" />
+					<Add directory="/usr/include/tinyxml" />
 				</Compiler>
 				<Linker>
 					<Add library="CEGUIOgreRenderer" />
-					<Add directory="\bin\Debug" />
-					<Add directory="\bin\Release" />
-					<Add directory="\usr\local\include" />
+					<Add library="gimpactutils" />
+					<Add directory="/usr/local/include" />
+					<Add directory="/home/fish/Flow/bullet-2.74/src/.libs" />
+					<Add directory="/home/fish/Flow/bullet-2.74/Extras" />
 				</Linker>
 			</Target>
 			<Target title="Windows Build">
 				<Option platforms="Windows;" />
-				<Option output="H:\Build\Flow" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="H:\Build" />
-				<Option object_output="obj\flow-win\" />
+				<Option output="H:/Build/Flow" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="H:/Build" />
+				<Option object_output="obj/flow-win/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -47,28 +49,28 @@
 					<Add option="-DWIN32" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-DNDEBUG" />
-					<Add directory="H:\App\bullet-2.74\src" />
-					<Add directory="H:\App\OgreSDK\include" />
-					<Add directory="H:\App\OgreSDK\samples\include" />
-					<Add directory="H:\App\OgreSDK\samples\refapp\include" />
-					<Add directory="H:\App\OgreSDK\include\CEGUI" />
-					<Add directory="H:\App\OgreSDK\include\OIS" />
+					<Add directory="H:/App/bullet-2.74/src" />
+					<Add directory="H:/App/OgreSDK/include" />
+					<Add directory="H:/App/OgreSDK/samples/include" />
+					<Add directory="H:/App/OgreSDK/samples/refapp/include" />
+					<Add directory="H:/App/OgreSDK/include/CEGUI" />
+					<Add directory="H:/App/OgreSDK/include/OIS" />
 				</Compiler>
 				<Linker>
 					<Add option="-Wl,--enable-runtime-pseudo-reloc" />
 					<Add option="-Wl,--enable-auto-image-base" />
 					<Add option="-Wl,--add-stdcall-alias" />
 					<Add library="OgreGUIRenderer" />
-					<Add directory="H:\App\OgreSDK\lib" />
-					<Add directory="H:\App\OgreSDK\bin\Debug" />
-					<Add directory="H:\App\OgreSDK\bin\Release" />
-					<Add directory="H:\App\bullet-2.74\out\release8\libs" />
+					<Add library="GIMPACTUtils" />
+					<Add directory="H:/App/OgreSDK/lib" />
+					<Add directory="H:/App/OgreSDK/bin/Debug" />
+					<Add directory="H:/App/OgreSDK/bin/Release" />
+					<Add directory="H:/App/bullet-2.74/out/release8/libs" />
 				</Linker>
 			</Target>
 		</Build>
 		<Linker>
 			<Add library="bulletdynamics" />
-			<Add library="GIMPACTUtils" />
 			<Add library="bulletcollision" />
 			<Add library="bulletmath" />
 			<Add library="OgreMain" />
@@ -90,13 +92,14 @@
 		<Unit filename="MenuState.cpp" />
 		<Unit filename="MenuState.hpp" />
 		<Unit filename="main.cpp" />
-		<Unit filename="tinyxml\tinystr.cpp" />
-		<Unit filename="tinyxml\tinystr.h" />
-		<Unit filename="tinyxml\tinyxml.cpp" />
-		<Unit filename="tinyxml\tinyxml.h" />
-		<Unit filename="tinyxml\tinyxmlerror.cpp" />
-		<Unit filename="tinyxml\tinyxmlparser.cpp" />
+		<Unit filename="tinyxml/tinystr.cpp" />
+		<Unit filename="tinyxml/tinystr.h" />
+		<Unit filename="tinyxml/tinyxml.cpp" />
+		<Unit filename="tinyxml/tinyxml.h" />
+		<Unit filename="tinyxml/tinyxmlerror.cpp" />
+		<Unit filename="tinyxml/tinyxmlparser.cpp" />
 		<Extensions>
+			<envvars />
 			<code_completion />
 			<debugger />
 		</Extensions>
