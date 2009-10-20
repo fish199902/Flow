@@ -1,6 +1,7 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #include "MenuState.hpp"
+#include "GameState.hpp"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -13,7 +14,7 @@ void MenuState::enter()
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Entering MenuState...");
 
 	m_pSceneMgr = OgreFramework::getSingletonPtr()->m_pRoot->createSceneManager(ST_GENERIC, "MenuSceneMgr");
-	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));
+	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.9));
 
 	m_pCamera = m_pSceneMgr->createCamera("MenuCam");
 	m_pCamera->setPosition(Vector3(0, 25, -50));
@@ -99,7 +100,13 @@ bool MenuState::onExitButton(const CEGUI::EventArgs &args)
 
 bool MenuState::onEnterButton(const CEGUI::EventArgs &args)
 {
-	this->pushAppState(findByName("GameState"));
+    GameState* levelState = (GameState*) findByName("GameState");
+
+    /// \todo Select the level, instead of just loading the first
+    Ogre::String levelName = "level1";
+
+    levelState->setLevel(levelName);
+	this->pushAppState(levelState);
 	return true;
 }
 

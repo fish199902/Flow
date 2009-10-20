@@ -44,13 +44,13 @@ void GameState::enter()
 	OgreFramework::getSingletonPtr()->m_pGUIRenderer->setTargetSceneManager(m_pSceneMgr);
 
 	OgreFramework::getSingletonPtr()->m_pGUISystem->setDefaultMouseCursor((CEGUI::utf8*)"TaharezLook", (CEGUI::utf8*)"MouseArrow");
-        CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseArrow");
-        const OIS::MouseState state = OgreFramework::getSingletonPtr()->m_pMouse->getMouseState();
+    CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseArrow");
+    const OIS::MouseState state = OgreFramework::getSingletonPtr()->m_pMouse->getMouseState();
 	CEGUI::Point mousePos = CEGUI::MouseCursor::getSingleton().getPosition();
 	CEGUI::System::getSingleton().injectMouseMove(state.X.abs-mousePos.d_x,state.Y.abs-mousePos.d_y);
 
 	m_pMainWnd = CEGUI::WindowManager::getSingleton().getWindow("AOF_GUI_GAME");
-	m_pChatWnd = CEGUI::WindowManager::getSingleton().getWindow("ChatWnd");
+	//m_pChatWnd = CEGUI::WindowManager::getSingleton().getWindow("ChatWnd");
 
 	OgreFramework::getSingletonPtr()->m_pGUISystem->setGUISheet(m_pMainWnd);
 
@@ -101,162 +101,56 @@ void GameState::exit()
 		OgreFramework::getSingletonPtr()->m_pRoot->destroySceneManager(m_pSceneMgr);
 }
 
+/// Set the name of the level to be loaded when the game state is activated
+void GameState::setLevel(Ogre::String levelName)
+{
+    /// \todo Any setup this might require
+    m_LevelName = levelName;
+}
+
 void GameState::createScene()
 {
 	//m_pSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
-	m_pSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
+	//m_pSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
 	m_pSceneMgr->createLight("Light")->setPosition(75,75,75);
 
 	Ogre::DotSceneLoader* pDotSceneLoader = new Ogre::DotSceneLoader();
-	pDotSceneLoader->parseDotScene("CubeScene.xml", "General", m_pSceneMgr, m_pSceneMgr->getRootSceneNode());
-
-	m_pSceneMgr->getEntity("Cube01")->setQueryFlags(CUBE_MASK);
-	m_pSceneMgr->getEntity("Cube02")->setQueryFlags(CUBE_MASK);
-	m_pSceneMgr->getEntity("Cube03")->setQueryFlags(CUBE_MASK);
-
-	m_pOgreHeadEntity = m_pSceneMgr->createEntity("Cube", "ogrehead.mesh");
-	m_pOgreHeadEntity->setQueryFlags(OGRE_HEAD_MASK);
-	m_pOgreHeadNode = m_pSceneMgr->getRootSceneNode()->createChildSceneNode("CubeNode");
-	m_pOgreHeadNode->attachObject(m_pOgreHeadEntity);
-	m_pOgreHeadNode->setPosition(Vector3(0, 0, -25));
-
-	m_pOgreHeadMat = m_pOgreHeadEntity->getSubEntity(1)->getMaterial();
-	m_pOgreHeadMatHigh = m_pOgreHeadMat->clone("OgreHeadMatHigh");
-	m_pOgreHeadMatHigh->getTechnique(0)->getPass(0)->setAmbient(1, 0, 0);
-	m_pOgreHeadMatHigh->getTechnique(0)->getPass(0)->setDiffuse(1, 0, 0, 0);
+	pDotSceneLoader->parseDotScene(m_LevelName + ".xml", "General", m_pSceneMgr, m_pSceneMgr->getRootSceneNode());
 }
 
 bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
-	if(m_bChatMode == true)
-	{
-		OgreFramework::getSingletonPtr()->m_pGUISystem->injectKeyDown(keyEventRef.key);
-		OgreFramework::getSingletonPtr()->m_pGUISystem->injectChar(keyEventRef.text);
-	}
 
-	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_ESCAPE))
-	{
-		m_bQuit = true;
-		return true;
-	}
-
-	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_TAB))
-	{
-		m_bChatMode = !m_bChatMode;
-
-		if(m_bChatMode)
-			setBufferedMode();
-		else
-			setUnbufferedMode();
-
-		return true;
-	}
-
-	if(m_bChatMode && OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_RETURN) ||
-		OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_NUMPADENTER))
-	{
-		CEGUI::Editbox* pChatInputBox = (CEGUI::Editbox*)m_pChatWnd->getChild("ChatInputBox");
-		CEGUI::MultiLineEditbox *pChatContentBox = (CEGUI::MultiLineEditbox*)m_pChatWnd->getChild("ChatContentBox");
-		pChatContentBox->setText(pChatContentBox->getText() + pChatInputBox->getText() + "\n");
-		pChatInputBox->setText("");
-		pChatContentBox->setCaratIndex(pChatContentBox->getText().size());
-		pChatContentBox->ensureCaratIsVisible();
-	}
-
-	if(!m_bChatMode || (m_bChatMode && !OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_O)))
-		OgreFramework::getSingletonPtr()->keyPressed(keyEventRef);
-
-	return true;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 bool GameState::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
-	OgreFramework::getSingletonPtr()->keyReleased(keyEventRef);
 
-	return true;
 }
 
 bool GameState::mouseMoved(const OIS::MouseEvent &evt)
 {
-	OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseWheelChange(evt.state.Z.rel);
-	OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseMove(evt.state.X.rel, evt.state.Y.rel);
 
-	if(m_bRMouseDown)
-	{
-		m_pCamera->yaw(Degree(evt.state.X.rel * -0.1));
-		m_pCamera->pitch(Degree(evt.state.Y.rel * -0.1));
-	}
-
-	return true;
 }
 
 bool GameState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
-    if(id == OIS::MB_Left)
-    {
-        onLeftPressed(evt);
-        m_bLMouseDown = true;
 
-	OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseButtonDown(CEGUI::LeftButton);
-    }
-    else if(id == OIS::MB_Right)
-    {
-        m_bRMouseDown = true;
-    }
-
-	return true;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 bool GameState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
-	if(id == OIS::MB_Left)
-    {
-        m_bLMouseDown = false;
 
-	OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseButtonUp(CEGUI::LeftButton);
-    }
-    else if(id == OIS::MB_Right)
-    {
-        m_bRMouseDown = false;
-    }
-
-	return true;
 }
 
 void GameState::onLeftPressed(const OIS::MouseEvent &evt)
 {
-	if(m_pCurrentObject)
-	{
-		m_pCurrentObject->showBoundingBox(false);
-		m_pCurrentEntity->getSubEntity(1)->setMaterial(m_pOgreHeadMat);
-	}
 
-	CEGUI::Point mousePos = CEGUI::MouseCursor::getSingleton().getPosition();
-	Ogre::Ray mouseRay = m_pCamera->getCameraToViewportRay(mousePos.d_x/float(evt.state.width), mousePos.d_y/float(evt.state.height));
-	m_pRSQ->setRay(mouseRay);
-	m_pRSQ->setSortByDistance(true);
-
-	Ogre::RaySceneQueryResult &result = m_pRSQ->execute();
-	Ogre::RaySceneQueryResult::iterator itr;
-
-    for(itr = result.begin(); itr != result.end(); itr++)
-    {
-        if(itr->movable)
-        {
-			OgreFramework::getSingletonPtr()->m_pLog->logMessage("MovableName: " + itr->movable->getName());
-			m_pCurrentObject = m_pSceneMgr->getEntity(itr->movable->getName())->getParentSceneNode();
-			OgreFramework::getSingletonPtr()->m_pLog->logMessage("ObjName " + m_pCurrentObject->getName());
-			m_pCurrentObject->showBoundingBox(true);
-			m_pCurrentEntity = m_pSceneMgr->getEntity(itr->movable->getName());
-			m_pCurrentEntity->getSubEntity(1)->setMaterial(m_pOgreHeadMatHigh);
-            break;
-        }
-    }
 }
 
 bool GameState::onExitButtonGame(const CEGUI::EventArgs &args)
@@ -342,10 +236,10 @@ void GameState::setBufferedMode()
 	CEGUI::Editbox* pModeCaption = (CEGUI::Editbox*)m_pMainWnd->getChild("ModeCaption");
 	pModeCaption->setText("Buffered Input Mode");
 
-	CEGUI::Editbox* pChatInputBox = (CEGUI::Editbox*)m_pChatWnd->getChild("ChatInputBox");
-	pChatInputBox->setText("");
-	pChatInputBox->activate();
-	pChatInputBox->captureInput();
+	//CEGUI::Editbox* pChatInputBox = (CEGUI::Editbox*)m_pChatWnd->getChild("ChatInputBox");
+	//pChatInputBox->setText("");
+	//pChatInputBox->activate();
+	//pChatInputBox->captureInput();
 
 	CEGUI::MultiLineEditbox* pControlsPanel = (CEGUI::MultiLineEditbox*)m_pMainWnd->getChild("ControlsPanel");
 	pControlsPanel->setText("[Tab] - To switch between input modes\n\nAll keys to write in the chat box.\n\nPress [Enter] or [Return] to send message.\n\n[Print] - Take screenshot\n\n[Esc] - Quit to main menu");

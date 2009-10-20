@@ -35,6 +35,8 @@ public:
 	bool pause(); //{return true;}
 	void resume(); //{};
 
+	void setLevel(Ogre::String levelName);
+
 	void moveCamera();
 	void getInput();
 
@@ -54,27 +56,24 @@ public:
 	void setUnbufferedMode();
 
 private:
-	Ogre::SceneNode*			m_pOgreHeadNode;
-	Ogre::Entity*				m_pOgreHeadEntity;
-	Ogre::MaterialPtr			m_pOgreHeadMat;
-	Ogre::MaterialPtr			m_pOgreHeadMatHigh;
+	bool				    	m_bQuit;
 
-	bool					m_bQuit;
+	Ogre::String                m_LevelName;
 
 	Ogre::Vector3				m_TranslateVector;
-	Ogre::Real				m_MoveSpeed;
-	Ogre::Degree				m_RotateSpeed;
-	float					m_MoveScale;
+	Ogre::Real			    	m_MoveSpeed;
+	Ogre::Degree	    		m_RotateSpeed;
+	float		    			m_MoveScale;
 	Ogre::Degree				m_RotScale;
 
-	Ogre::RaySceneQuery*		        m_pRSQ;
+	Ogre::RaySceneQuery*		m_pRSQ;
 	Ogre::SceneNode*			m_pCurrentObject;
 	Ogre::Entity*				m_pCurrentEntity;
-	bool					m_bLMouseDown, m_bRMouseDown;
-	bool					m_bChatMode;
+	bool				    	m_bLMouseDown, m_bRMouseDown;
+	bool					    m_bChatMode;
 
 	CEGUI::Window*				m_pMainWnd;
-	CEGUI::Window*				m_pChatWnd;
+	//CEGUI::Window*				m_pChatWnd;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
