@@ -10,7 +10,7 @@ using namespace Ogre;
 
 GameState::GameState()
 {
-	m_MoveSpeed		= 0.1;
+	m_MoveSpeed 		= 0.1;
 	m_RotateSpeed		= 0.3;
 
 	m_pCurrentObject	= 0;
@@ -23,7 +23,7 @@ void GameState::enter()
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Entering GameState...");
 
 	m_pSceneMgr = OgreFramework::getSingletonPtr()->m_pRoot->createSceneManager(ST_GENERIC, "GameSceneMgr");
-	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));
+	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(1, 1, 1));
 
 	m_pRSQ = m_pSceneMgr->createRayQuery(Ray());
 	m_pRSQ->setQueryMask(OGRE_HEAD_MASK);
@@ -103,7 +103,8 @@ void GameState::exit()
 
 void GameState::createScene()
 {
-	m_pSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
+	//m_pSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
+	m_pSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
 	m_pSceneMgr->createLight("Light")->setPosition(75,75,75);
 
