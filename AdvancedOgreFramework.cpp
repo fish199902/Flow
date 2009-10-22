@@ -110,18 +110,16 @@ void OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
        m_pGUISystem = new CEGUI::System(m_pGUIRenderer);
 
 	CEGUI::SchemeManager::getSingleton().loadScheme((CEGUI::utf8*)"TaharezLookSkin.scheme");
-	CEGUI::WindowManager::getSingleton().loadWindowLayout((CEGUI::utf8*)"AdvancedOgreFramework.layout");
-	CEGUI::WindowManager::getSingleton().loadWindowLayout((CEGUI::utf8*)"AdvancedOgreFramework_Game.layout");
+	CEGUI::WindowManager::getSingleton().loadWindowLayout((CEGUI::utf8*)"FlowMenu.layout");
+	CEGUI::WindowManager::getSingleton().loadWindowLayout((CEGUI::utf8*)"FlowGame.layout");
 
 	m_pDebugOverlay = OverlayManager::getSingleton().getByName("Core/DebugOverlay");
-	m_pDebugOverlay->show();
-
 	m_pRenderWnd->setActive(true);
 }
 
 bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
-	if(m_pKeyboard->isKeyDown(OIS::KC_SYSRQ))
+	if (m_pKeyboard->isKeyDown(OIS::KC_SYSRQ))
 	{
 		std::ostringstream ss;
 		ss << "screenshot_" << ++m_iNumScreenShots << ".png";
@@ -129,7 +127,9 @@ bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
 		return true;
 	}
 
-	if(m_pKeyboard->isKeyDown(OIS::KC_O))
+	if (m_pKeyboard->isKeyDown(OIS::KC_RCONTROL) &&
+        m_pKeyboard->isKeyDown(OIS::KC_RSHIFT) &&
+        m_pKeyboard->isKeyDown(OIS::KC_D))
 	{
 		if(m_pDebugOverlay)
 		{

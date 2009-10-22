@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<GUILayout>
+
+<Window Type="DefaultGUISheet" Name="AOF_GUI">
+		<Property Name="UnifiedSize" Value="{{1, 1},{1, 1}}" />
+
+		<Window Type="TaharezLook/Button" Name="NewGameButton">
+                <Property Name="UnifiedPosition" Value="{{0.1,0},{0.2,0}}" />
+                <Property Name="UnifiedSize" Value="{{0.3,0},{0.1,0}}" />
+                <Property Name="Text" Value="New Game" />
+            </Window>
+
+		<Window Type="TaharezLook/Button" Name="SelectLevelButton">
+                <Property Name="UnifiedPosition" Value="{{0.6,0},{0.2,0}}" />
+                <Property Name="UnifiedSize" Value="{{0.3,0},{0.1,0}}" />
+                <Property Name="Text" Value="Level Select" />
+            </Window>
+
+		<Window Type="TaharezLook/Button" Name="OptionsButton">
+                <Property Name="UnifiedPosition" Value="{{0.35,0},{0.4,0}}" />
+                <Property Name="UnifiedSize" Value="{{0.3,0},{0.1,0}}" />
+                <Property Name="Text" Value="New Game" />
+            </Window>
+
+		<Window Type="TaharezLook/Button" Name="QuitButton">
+                <Property Name="UnifiedPosition" Value="{{0.35,0},{0.6,0}}" />
+                <Property Name="UnifiedSize" Value="{{0.3,0},{0.1,0}}" />
+                <Property Name="Text" Value="Quit Flow" />
+            </Window>
+
+		<Window Type="TaharezLook/Editbox" Name="CreditsButton">
+                <Property Name="UnifiedPosition" Value="{{0.1,0},{0.8,0}}" />
+                <Property Name="UnifiedSize" Value="{{0.8,0},{0.1,0}}" />
+                <Property Name="Text" Value="Flow by Austin Brown.
+Based on AdvancedOgreFramework by spacegaier 2009." />
+            </Window>
+</Window>
+
+</GUILayout>
+

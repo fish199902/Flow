@@ -40,9 +40,9 @@ void MenuState::enter()
 	CEGUI::Window* pMainWnd = CEGUI::WindowManager::getSingleton().getWindow("AOF_GUI");
         OgreFramework::getSingletonPtr()->m_pGUISystem->setGUISheet(pMainWnd);
 
-	CEGUI::PushButton* button = (CEGUI::PushButton*)pMainWnd->getChild("ExitButton");
+	CEGUI::PushButton* button = (CEGUI::PushButton*)pMainWnd->getChild("QuitButton");
 	button->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuState::onExitButton, this));
-	button = (CEGUI::PushButton*)pMainWnd->getChild("EnterButton");
+	button = (CEGUI::PushButton*)pMainWnd->getChild("NewGameButton");
 	button->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuState::onEnterButton, this));
 
 	m_bQuit = false;
@@ -118,7 +118,7 @@ bool MenuState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		return true;
 	}
 
-      	OgreFramework::getSingletonPtr()->keyPressed(keyEventRef);
+    OgreFramework::getSingletonPtr()->keyPressed(keyEventRef);
 
 	return true;
 }

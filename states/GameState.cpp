@@ -121,31 +121,50 @@ void GameState::createScene()
 
 bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_ESCAPE))
+	{
+		m_bQuit = true;
+		return true;
+	}
 
+    OgreFramework::getSingletonPtr()->keyPressed(keyEventRef);
+
+	return true;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 bool GameState::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
+	OgreFramework::getSingletonPtr()->keyReleased(keyEventRef);
 
+	return true;
 }
 
 bool GameState::mouseMoved(const OIS::MouseEvent &evt)
 {
+	OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseWheelChange(evt.state.Z.rel);
+	OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseMove(evt.state.X.rel, evt.state.Y.rel);
 
+	return true;
 }
 
 bool GameState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+	if(id == OIS::MB_Left)
+		OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseButtonDown(CEGUI::LeftButton);
 
+	return true;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 bool GameState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+	if(id == OIS::MB_Left)
+		OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseButtonUp(CEGUI::LeftButton);
 
+	return true;
 }
 
 void GameState::onLeftPressed(const OIS::MouseEvent &evt)

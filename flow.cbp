@@ -88,6 +88,7 @@
 		<Unit filename="Flow.cpp" />
 		<Unit filename="Flow.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="resources\FlowMenu.layout" />
 		<Unit filename="states\GameState.cpp" />
 		<Unit filename="states\GameState.hpp" />
 		<Unit filename="states\MenuState.cpp" />
