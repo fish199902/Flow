@@ -76,16 +76,16 @@
 			<Add library="OIS" />
 			<Add library="CEGUIBase" />
 		</Linker>
-		<Unit filename="AdvancedOgreFramework.cpp" />
-		<Unit filename="AdvancedOgreFramework.hpp" />
-		<Unit filename="AppState.hpp" />
-		<Unit filename="AppStateManager.cpp" />
-		<Unit filename="AppStateManager.hpp" />
-		<Unit filename="DotSceneLoader.cpp" />
-		<Unit filename="DotSceneLoader.hpp" />
 		<Unit filename="Doxyfile" />
 		<Unit filename="Flow.cpp" />
 		<Unit filename="Flow.hpp" />
+		<Unit filename="framework/AdvancedOgreFramework.cpp" />
+		<Unit filename="framework/AdvancedOgreFramework.hpp" />
+		<Unit filename="framework/AppState.hpp" />
+		<Unit filename="framework/AppStateManager.cpp" />
+		<Unit filename="framework/AppStateManager.hpp" />
+		<Unit filename="framework/DotSceneLoader.cpp" />
+		<Unit filename="framework/DotSceneLoader.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="ogre.cfg" />
 		<Unit filename="plugins.cfg" />

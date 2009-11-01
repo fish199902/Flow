@@ -5,8 +5,8 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "AdvancedOgreFramework.hpp"
-#include "AppStateManager.hpp"
+#include "framework/AdvancedOgreFramework.hpp"
+#include "framework/AppStateManager.hpp"
 
 /// \todo Create necessary game states
 #include "states/MenuState.hpp"

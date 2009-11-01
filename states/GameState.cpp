@@ -29,8 +29,8 @@ void GameState::enter()
 	m_pRSQ->setQueryMask(OGRE_HEAD_MASK);
 
 	m_pCamera = m_pSceneMgr->createCamera("GameCamera");
-	m_pCamera->setPosition(Vector3(5, 60, 60));
-	m_pCamera->lookAt(Vector3(5, 20, 0));
+	m_pCamera->setPosition(Vector3(3, 20, 40));
+	m_pCamera->lookAt(Vector3(3, 5, 0));
 	m_pCamera->setNearClipDistance(5);
 
 	m_pCamera->setAspectRatio(Real(OgreFramework::getSingletonPtr()->m_pViewport->getActualWidth()) /
@@ -111,7 +111,7 @@ void GameState::setLevel(Ogre::String levelName)
 void GameState::createScene()
 {
 	//m_pSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
-	m_pSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
+	m_pSceneMgr->setSkyBox(true, "Examples/EveningSkyBox");
 
 	m_pSceneMgr->createLight("Light")->setPosition(75,75,75);
 

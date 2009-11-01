@@ -5,9 +5,9 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "../AppState.hpp"
+#include "../framework/AppState.hpp"
 
-#include "../DotSceneLoader.hpp"
+#include "../framework/DotSceneLoader.hpp"
 
 #include <OgreSubEntity.h>
 #include <OgreMaterialManager.h>

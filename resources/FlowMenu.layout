@@ -31,8 +31,7 @@
 		<Window Type="TaharezLook/Editbox" Name="CreditsButton">
                 <Property Name="UnifiedPosition" Value="{{0.1,0},{0.8,0}}" />
                 <Property Name="UnifiedSize" Value="{{0.8,0},{0.1,0}}" />
-                <Property Name="Text" Value="Flow by Austin Brown.
-Based on AdvancedOgreFramework by spacegaier 2009." />
+                <Property Name="Text" Value="Flow (c) 2009 Austin Brown" />
             </Window>
 </Window>
 
