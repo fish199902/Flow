@@ -51,9 +51,8 @@ void OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 
 	m_pRoot = new Ogre::Root();
 
-    #ifdef ALWAYS_SHOW_CONFIG
 	m_pRoot->showConfigDialog();
-	#endif
+
 	m_pRenderWnd = m_pRoot->initialise(true, wndTitle);
 
 	m_pViewport = m_pRenderWnd->addViewport(0);
