@@ -103,7 +103,7 @@ bool MenuState::onEnterButton(const CEGUI::EventArgs &args)
     GameState* levelState = (GameState*) findByName("GameState");
 
     /// \todo Select the level, instead of just loading the first
-    Ogre::String levelName = "level1";
+    Ogre::String levelName = "demo";
 
     levelState->setLevel(levelName);
 	this->pushAppState(levelState);

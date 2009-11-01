@@ -111,7 +111,7 @@ void GameState::setLevel(Ogre::String levelName)
 void GameState::createScene()
 {
 	//m_pSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
-	//m_pSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
+	m_pSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
 	m_pSceneMgr->createLight("Light")->setPosition(75,75,75);
 
