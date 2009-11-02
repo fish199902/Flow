@@ -23,7 +23,7 @@ void GameState::enter()
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Entering GameState...");
 
 	m_pSceneMgr = OgreFramework::getSingletonPtr()->m_pRoot->createSceneManager(ST_GENERIC, "GameSceneMgr");
-	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(.8, .8, .8));
+	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(1, 1, 1));
 
 	m_pRSQ = m_pSceneMgr->createRayQuery(Ray());
 	m_pRSQ->setQueryMask(OGRE_HEAD_MASK);

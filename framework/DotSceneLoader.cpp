@@ -1,5 +1,5 @@
 #include "DotSceneLoader.hpp"
-#include "tinyxml/tinyxml.h"
+#include "../tinyxml/tinyxml.h"
 #include <Ogre.h>
 
 using namespace std;
