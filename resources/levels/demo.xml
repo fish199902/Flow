@@ -1,0 +1,69 @@
+<scene formatVersion="1.0.0">
+  <nodes>
+    <node name="Title">
+      <position x="-3.738221" y="7.863840" z="1.771676"/>
+      <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="6.192460" y="6.192460" z="6.192460"/>
+      <entity name="Title" meshFile="Title.mesh"/>
+    </node>
+    <node name="StartPipe">
+      <position x="-14.000000" y="0.000000" z="-0.000000"/>
+      <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <entity name="StartPipe" meshFile="StartPipe.mesh"/>
+    </node>
+    <node name="EndDrain">
+      <position x="2.000000" y="0.000000" z="-0.000000"/>
+      <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <entity name="EndDrain" meshFile="EndDrain.mesh"/>
+    </node>
+    <node name="Player">
+      <position x="-10.052222" y="2.944333" z="-0.000000"/>
+      <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="1.599206" y="1.264285" z="1.500000"/>
+      <entity name="Player" meshFile="Player.mesh"/>
+    </node>
+    <node name="Lamp">
+      <position x="9.076245" y="31.693310" z="-1.005454"/>
+      <quaternion x="-0.284166" y="0.726942" z="0.342034" w="0.523275"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <light name="Sun" type="directional">
+        <normal x="0.0" y="0.0" z="-1.0"/>
+        <colourDiffuse r="1.100000" g="1.100000" b="1.100000"/>
+        <colourSpecular r="1.100000" g="1.100000" b="1.100000"/>
+      </light>
+    </node>
+    <node name="TitleLight">
+      <position x="-4.664585" y="14.230421" z="-7.838709"/>
+      <quaternion x="-0.707107" y="0.000000" z="0.000000" w="0.707107"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <light name="TitleLight" type="point">
+        <colourDiffuse r="1.000000" g="1.000000" b="1.000000"/>
+        <colourSpecular r="1.000000" g="1.000000" b="1.000000"/>
+        <lightAttenuation range="5000.0" constant="1.000000" linear="0.050000" quadratic="0.000000"/>
+      </light>
+    </node>
+    <node name="SimpleTrack">
+      <position x="-10.000000" y="0.000000" z="-0.000000"/>
+      <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <entity name="SimpleTrack" meshFile="SimpleTrack.mesh"/>
+    </node>
+    <node name="Font">
+      <position x="-3.200000" y="7.375669" z="2.052953"/>
+      <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="0.700000" y="0.700000" z="0.700000"/>
+      <entity name="Font" meshFile="CText.mesh"/>
+    </node>
+  </nodes>
+  <externals>
+    <item type="material">
+      <file name="Scene.material"/>
+    </item>
+  </externals>
+  <environment>
+    <colourAmbient r="0.000000" g="0.000000" b="0.000000"/>
+    <colourBackground r="0.434899" g="0.697627" b="0.984239"/>
+  </environment>
+</scene>
