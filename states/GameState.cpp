@@ -11,7 +11,7 @@ using namespace Ogre;
 GameState::GameState()
 {
 	m_MoveSpeed 		= 0.1;
-	m_RotateSpeed		= 0.3;
+	m_RotateSpeed		= 0.1;
 
 	m_pCurrentObject	= 0;
 }
@@ -59,7 +59,6 @@ void GameState::enter()
 
 	m_bLMouseDown = m_bRMouseDown = false;
 	m_bQuit = false;
-	m_bChatMode = false;
 
 	setUnbufferedMode();
 
@@ -123,6 +122,7 @@ bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
 	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_ESCAPE))
 	{
+	    // Exit from GameState to MenuState on next update()
 		m_bQuit = true;
 		return true;
 	}
@@ -143,6 +143,7 @@ bool GameState::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 bool GameState::mouseMoved(const OIS::MouseEvent &evt)
 {
+    // Pass motion to CEGUI
 	OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseWheelChange(evt.state.Z.rel);
 	OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseMove(evt.state.X.rel, evt.state.Y.rel);
 
@@ -151,6 +152,7 @@ bool GameState::mouseMoved(const OIS::MouseEvent &evt)
 
 bool GameState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+    // Pass clicks to CEGUI
 	if(id == OIS::MB_Left)
 		OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseButtonDown(CEGUI::LeftButton);
 
@@ -161,6 +163,7 @@ bool GameState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 
 bool GameState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+    // Pass releases to CEGUI
 	if(id == OIS::MB_Left)
 		OgreFramework::getSingletonPtr()->m_pGUISystem->injectMouseButtonUp(CEGUI::LeftButton);
 
@@ -174,6 +177,7 @@ void GameState::onLeftPressed(const OIS::MouseEvent &evt)
 
 bool GameState::onExitButtonGame(const CEGUI::EventArgs &args)
 {
+    // Exit from GameState to MenuState on next update()
 	m_bQuit = true;
 	return true;
 }
@@ -187,49 +191,59 @@ void GameState::moveCamera()
 	m_pCamera->moveRelative(m_TranslateVector / 10);
 }
 
+/**
+ * Handles key mappings. WASD for motion, Arrows for camera, E/C for move up and down.
+ */
 void GameState::getInput()
 {
-	if(m_bChatMode == false)
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_A))
 	{
-		if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_A))
-		{
-			m_TranslateVector.x = -m_MoveScale;
-		}
+		m_TranslateVector.x = -m_MoveScale;
+	}
 
-		if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_D))
-		{
-			m_TranslateVector.x = m_MoveScale;
-		}
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_D))
+	{
+		m_TranslateVector.x = m_MoveScale;
+	}
 
-		if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_W))
-		{
-			m_TranslateVector.z = -m_MoveScale;
-		}
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_W))
+	{
+		m_TranslateVector.z = -m_MoveScale;
+	}
 
-		if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_S))
-		{
-			m_TranslateVector.z = m_MoveScale;
-		}
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_S))
+	{
+		m_TranslateVector.z = m_MoveScale;
+	}
 
-		if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_LEFT))
-		{
-			m_pCamera->yaw(m_RotScale);
-		}
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_C))
+	{
+		m_TranslateVector.y = -m_MoveScale;
+	}
 
-		if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_RIGHT))
-		{
-			m_pCamera->yaw(-m_RotScale);
-		}
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_E))
+	{
+		m_TranslateVector.y = m_MoveScale;
+	}
 
-		if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_UP))
-		{
-			m_pCamera->pitch(m_RotScale);
-		}
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_LEFT))
+	{
+		m_pCamera->yaw(m_RotScale);
+	}
 
-		if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_DOWN))
-		{
-			m_pCamera->pitch(-m_RotScale);
-		}
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_RIGHT))
+	{
+		m_pCamera->yaw(-m_RotScale);
+	}
+
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_UP))
+	{
+		m_pCamera->pitch(m_RotScale);
+	}
+
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_DOWN))
+	{
+		m_pCamera->pitch(-m_RotScale);
 	}
 }
 
@@ -261,7 +275,15 @@ void GameState::setBufferedMode()
 	//pChatInputBox->captureInput();
 
 	CEGUI::MultiLineEditbox* pControlsPanel = (CEGUI::MultiLineEditbox*)m_pMainWnd->getChild("ControlsPanel");
-	pControlsPanel->setText("[Tab] - To switch between input modes\n\nAll keys to write in the chat box.\n\nPress [Enter] or [Return] to send message.\n\n[Print] - Take screenshot\n\n[Esc] - Quit to main menu");
+	pControlsPanel->setText("[Tab] - To switch between input modes\n"
+                            "\n"
+                            "All keys to write in the chat box.\n"
+                            "\n"
+                            "Press [Enter] or [Return] to send message.\n"
+                            "\n"
+                            "[Print] - Take screenshot\n"
+                            "\n"
+                            "[Esc] - Quit to main menu");
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -272,6 +294,17 @@ void GameState::setUnbufferedMode()
 	pModeCaption->setText("Unuffered Input Mode");
 
 	CEGUI::MultiLineEditbox* pControlsPanel = (CEGUI::MultiLineEditbox*)m_pMainWnd->getChild("ControlsPanel");
-	pControlsPanel->setText("[Tab] - To switch between input modes\n\n[W] - Forward\n[S] - Backwards\n[A] - Left\n[D] - Right\n\nPress [Shift] to move faster\n\n[O] - Toggle Overlays\n[Print] - Take screenshot\n\n[Esc] - Quit to main menu");
+	pControlsPanel->setText("[Tab] - To switch between input modes\n\n"
+                            "[W] - Forward\n"
+                            "[S] - Backwards\n"
+                            "[A] - Left\n"
+                            "[D] - Right\n"
+                            "\n"
+                            "Press [Shift] to move faster\n"
+                            "\n"
+                            "[O] - Toggle Overlays\n"
+                            "[Print] - Take screenshot\n"
+                            "\n"
+                            "[Esc] - Quit to main menu");
 }
 

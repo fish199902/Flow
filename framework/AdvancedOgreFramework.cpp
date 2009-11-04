@@ -42,6 +42,9 @@ OgreFramework::~OgreFramework()
 	delete m_pRoot;
 }
 
+/**
+ * Setup ogre and CEGUI
+ */
 void OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener)
 {
 	Ogre::LogManager* logMgr = new Ogre::LogManager();
@@ -118,6 +121,10 @@ void OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	m_pRenderWnd->setActive(true);
 }
 
+/**
+ * Handle global keypresses, including activating/deactivating the debug overlay
+ * and taking screenshots.
+ */
 bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
 	if (m_pKeyboard->isKeyDown(OIS::KC_SYSRQ))
@@ -130,7 +137,7 @@ bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
 
 	if (m_pKeyboard->isKeyDown(OIS::KC_RCONTROL) &&
         m_pKeyboard->isKeyDown(OIS::KC_RSHIFT) &&
-        m_pKeyboard->isKeyDown(OIS::KC_D))
+        m_pKeyboard->isKeyDown(OIS::KC_SLASH))
 	{
 		if(m_pDebugOverlay)
 		{

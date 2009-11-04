@@ -70,7 +70,6 @@ private:
 	Ogre::SceneNode*			m_pCurrentObject;
 	Ogre::Entity*				m_pCurrentEntity;
 	bool				    	m_bLMouseDown, m_bRMouseDown;
-	bool					    m_bChatMode;
 
 	CEGUI::Window*				m_pMainWnd;
 	//CEGUI::Window*				m_pChatWnd;
