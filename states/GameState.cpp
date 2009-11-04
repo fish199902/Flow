@@ -25,6 +25,7 @@ void GameState::enter()
 	m_pSceneMgr = OgreFramework::getSingletonPtr()->m_pRoot->createSceneManager(ST_GENERIC, "GameSceneMgr");
 	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(1, 1, 1));
 
+    /// \todo Make sure this is not necessary for anything, and remove it *cleanly*.
 	m_pRSQ = m_pSceneMgr->createRayQuery(Ray());
 	m_pRSQ->setQueryMask(OGRE_HEAD_MASK);
 
@@ -62,6 +63,32 @@ void GameState::enter()
 
 	setUnbufferedMode();
 
+    OgreFramework::getSingletonPtr()->m_pLog->logMessage("Initializing Bullet physics...");
+
+	// Maximum number of rigid bodies
+    int maxProxies = 512;
+
+    // Size of the world, 10km in every direction
+    /// \todo Tune this to match ogre and save memory. Check the other options vere as well
+    btVector3 worldAabbMin(-10000,-10000,-10000);
+    btVector3 worldAabbMax(10000,10000,10000);
+
+    // Sweep and prune broadphase
+    /// \todo use the collision dispatcher to register a callback that filters overlapping broadphase proxies so that the collisions are not processed by the rest of the system.
+    broadphase = new btAxisSweep3(worldAabbMin,worldAabbMax,maxProxies);
+
+    // Collision configuration is used to fine tune the algorithms used for the full collision detection
+    collisionConfiguration = new btDefaultCollisionConfiguration();
+    dispatcher = new btCollisionDispatcher(collisionConfiguration);
+
+    // Solver determines how object interact
+    solver = new btSequentialImpulseConstraintSolver;
+
+    dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+
+    // Set Y axis to 'up', this should match ogre.
+    dynamicsWorld->setGravity(btVector3(0, -10, 0));
+
 	createScene();
 }
 
@@ -98,6 +125,14 @@ void GameState::exit()
 	m_pSceneMgr->destroyQuery(m_pRSQ);
 	if(m_pSceneMgr)
 		OgreFramework::getSingletonPtr()->m_pRoot->destroySceneManager(m_pSceneMgr);
+
+    // Cleanup physics simulation
+    delete dynamicsWorld;
+    delete solver;
+    delete dispatcher;
+    delete collisionConfiguration;
+    delete broadphase;
+
 }
 
 /// Set the name of the level to be loaded when the game state is activated
@@ -107,8 +142,10 @@ void GameState::setLevel(Ogre::String levelName)
     m_LevelName = levelName;
 }
 
+/// Contruct the level in Ogre
 void GameState::createScene()
 {
+    /// \todo Make this include setting up physics
 	//m_pSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
 	m_pSceneMgr->setSkyBox(true, "Examples/EveningSkyBox");
 

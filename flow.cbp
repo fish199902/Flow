@@ -92,7 +92,7 @@
 		<Unit filename="resources.cfg" />
 		<Unit filename="resources\FlowGame.layout" />
 		<Unit filename="resources\FlowMenu.layout" />
-		<Unit filename="resources\level1.xml" />
+		<Unit filename="resources\levels\demo.xml" />
 		<Unit filename="states\GameState.cpp" />
 		<Unit filename="states\GameState.hpp" />
 		<Unit filename="states\MenuState.cpp" />

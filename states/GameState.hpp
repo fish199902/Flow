@@ -9,6 +9,8 @@
 
 #include "../framework/DotSceneLoader.hpp"
 
+#include <btBulletDynamicsCommon.h>
+
 #include <OgreSubEntity.h>
 #include <OgreMaterialManager.h>
 
@@ -73,6 +75,12 @@ private:
 
 	CEGUI::Window*				m_pMainWnd;
 	//CEGUI::Window*				m_pChatWnd;
+
+	btDiscreteDynamicsWorld*                dynamicsWorld;
+	btSequentialImpulseConstraintSolver*    solver;
+	btCollisionDispatcher*                  dispatcher;
+	btDefaultCollisionConfiguration*        collisionConfiguration;
+	btAxisSweep3*                           broadphase;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
