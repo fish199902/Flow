@@ -7,6 +7,9 @@
 #include <OgreQuaternion.h>
 #include <vector>
 
+#include "../btogre/BtOgreExtras.h"
+#include "../btogre/BtOgreGP.h"
+
 // Forward declarations
 class TiXmlElement;
 
@@ -61,6 +64,7 @@ namespace Ogre
 		void processParticleSystem(TiXmlElement *XMLNode, SceneNode *pParent);
 		void processBillboardSet(TiXmlElement *XMLNode, SceneNode *pParent);
 		void processPlane(TiXmlElement *XMLNode, SceneNode *pParent);
+		void processPhysics(TiXmlElement *XMLNode, Entity *pEntity);
 
 		void processFog(TiXmlElement *XMLNode);
 		void processSkyBox(TiXmlElement *XMLNode);
@@ -84,6 +88,8 @@ namespace Ogre
 		SceneNode *mAttachNode;
 		String m_sGroupName;
 		String m_sPrependNode;
+
+		btDynamicsWorld *physicsWorld;
 	};
 }
 

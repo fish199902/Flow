@@ -76,11 +76,13 @@ private:
 	CEGUI::Window*				m_pMainWnd;
 	//CEGUI::Window*				m_pChatWnd;
 
-	btDiscreteDynamicsWorld*                dynamicsWorld;
+	btDiscreteDynamicsWorld*                physicsWorld;
 	btSequentialImpulseConstraintSolver*    solver;
 	btCollisionDispatcher*                  dispatcher;
 	btDefaultCollisionConfiguration*        collisionConfiguration;
 	btAxisSweep3*                           broadphase;
+
+	BtOgre::DebugDrawer*                    physicsDebug;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

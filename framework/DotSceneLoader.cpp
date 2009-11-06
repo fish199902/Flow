@@ -623,7 +623,37 @@ void DotSceneLoader::processEntity(TiXmlElement *XMLNode, SceneNode *pParent)
 	if(pElement)
 		processUserDataReference(pElement, pEntity);
 
+    pElement = XMLNote->FirstChildElement("physics");
+    if(pElement)
+        processPhysics(pElement, pEntity);
 
+}
+
+void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity)
+{
+    BtOgre::StaticMeshToShapeConverter converter(pEntity);
+
+    /// \todo Check for memory leaks, and make sure things created here are fixed in place
+
+    btCollisionShape* shape;
+    String shapeType = getAttrib(XMLNode, "shape");
+    if (shapeType == "box")
+        shape = converter.createBox():
+
+    else if (shapeType == "sphere")
+        shape = converter.createSphere();
+
+    else if (shapeType == "cylinder"}
+        shape = converter.createCylinder();
+
+    else
+        shape = converter.createTrimesh();
+
+    //Create MotionState
+    btDefaultMotionState* state = new btDefaultMotionState(
+	    btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));
+
+	physicsWorld->addRigidBody(new btRigidBody(0, state, shape, btVector3(0,0,0)))
 }
 
 void DotSceneLoader::processParticleSystem(TiXmlElement *XMLNode, SceneNode *pParent)

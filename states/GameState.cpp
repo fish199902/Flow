@@ -84,10 +84,14 @@ void GameState::enter()
     // Solver determines how object interact
     solver = new btSequentialImpulseConstraintSolver;
 
-    dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+    physicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
     // Set Y axis to 'up', this should match ogre.
-    dynamicsWorld->setGravity(btVector3(0, -10, 0));
+    physicsWorld->setGravity(btVector3(0, -10, 0));
+
+    // btOgre Stuff
+    physicsDebug = new BtOgre::DebugDrawer(m_pSceneMgr->getRootSceneNode(), phyicsWorld);
+	Globals::phyWorld->setDebugDrawer(physicsDebug);
 
 	createScene();
 }
@@ -296,6 +300,9 @@ void GameState::update(double timeSinceLastFrame)
 	m_RotScale  = m_RotateSpeed * timeSinceLastFrame;
 
 	m_TranslateVector = Vector3::ZERO;
+
+    // Update Bullet
+    Globals::phyWorld->stepSimulation(timeSinceLastFrame, 10);
 
 	getInput();
 	moveCamera();
