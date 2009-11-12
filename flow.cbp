@@ -85,6 +85,7 @@
 		<Unit filename="btogre\BtOgrePG.h" />
 		<Unit filename="btogre\BtOgreSoftBody.cpp">
 			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="btogre\BtOgreSoftBody.h" />
 		<Unit filename="framework\AdvancedOgreFramework.cpp" />

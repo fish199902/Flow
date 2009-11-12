@@ -17,7 +17,7 @@
       <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
       <scale x="1.000000" y="1.000000" z="1.000000"/>
       <entity name="EndDrain" meshFile="EndDrain.mesh">
-        <physics shape="Box" mass="5"/>
+        <physics shape="trimesh" mass="0"/>
       </entity>
     </node>
     <node name="Player">
@@ -25,9 +25,7 @@
       <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
       <scale x="1.599206" y="1.264285" z="1.500000"/>
       <entity name="Player" meshFile="Player.mesh">
-        <!-- TODO: Implement player physics
-        <physics shape="Box" mass="5"/>
-        -->
+        <physics shape="sphere" mass="5"/>
       </entity>
     </node>
     <node name="Lamp">
@@ -54,7 +52,9 @@
       <position x="-10.000000" y="0.000000" z="-0.000000"/>
       <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
       <scale x="1.000000" y="1.000000" z="1.000000"/>
-      <entity name="SimpleTrack" meshFile="SimpleTrack.mesh"/>
+      <entity name="SimpleTrack" meshFile="SimpleTrack.mesh">
+        <physics shape="trimesh" mass="0"/>
+      </entity>
     </node>
     <node name="Font">
       <position x="-3.200000" y="7.375669" z="2.052953"/>
