@@ -6,9 +6,11 @@
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 #include <vector>
+#include <sstream>
 
 #include "../btogre/BtOgreExtras.h"
 #include "../btogre/BtOgreGP.h"
+#include "../btogre/BtOgrePG.h"
 
 // Forward declarations
 class TiXmlElement;
@@ -37,7 +39,7 @@ namespace Ogre
 		DotSceneLoader() : mSceneMgr(0) {}
 		virtual ~DotSceneLoader() {}
 
-		void parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, SceneNode *pAttachNode = NULL, const String &sPrependNode = "");
+		void parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, btDiscreteDynamicsWorld *physWorld, SceneNode *pAttachNode = NULL, const String &sPrependNode = "");
 		String getProperty(const String &ndNm, const String &prop);
 
 		std::vector<nodeProperty> nodeProperties;
@@ -64,7 +66,7 @@ namespace Ogre
 		void processParticleSystem(TiXmlElement *XMLNode, SceneNode *pParent);
 		void processBillboardSet(TiXmlElement *XMLNode, SceneNode *pParent);
 		void processPlane(TiXmlElement *XMLNode, SceneNode *pParent);
-		void processPhysics(TiXmlElement *XMLNode, Entity *pEntity);
+		void processPhysics(TiXmlElement *XMLNode, Entity *pEntity, SceneNode *pNode);
 
 		void processFog(TiXmlElement *XMLNode);
 		void processSkyBox(TiXmlElement *XMLNode);
@@ -89,7 +91,7 @@ namespace Ogre
 		String m_sGroupName;
 		String m_sPrependNode;
 
-		btDynamicsWorld *physicsWorld;
+		btDiscreteDynamicsWorld *physicsWorld;
 	};
 }
 

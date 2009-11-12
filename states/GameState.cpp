@@ -90,8 +90,8 @@ void GameState::enter()
     physicsWorld->setGravity(btVector3(0, -10, 0));
 
     // btOgre Stuff
-    physicsDebug = new BtOgre::DebugDrawer(m_pSceneMgr->getRootSceneNode(), phyicsWorld);
-	Globals::phyWorld->setDebugDrawer(physicsDebug);
+    physicsDebug = new BtOgre::DebugDrawer(m_pSceneMgr->getRootSceneNode(), physicsWorld);
+	physicsWorld->setDebugDrawer(physicsDebug);
 
 	createScene();
 }
@@ -131,7 +131,7 @@ void GameState::exit()
 		OgreFramework::getSingletonPtr()->m_pRoot->destroySceneManager(m_pSceneMgr);
 
     // Cleanup physics simulation
-    delete dynamicsWorld;
+    delete physicsWorld;
     delete solver;
     delete dispatcher;
     delete collisionConfiguration;
@@ -156,7 +156,7 @@ void GameState::createScene()
 	m_pSceneMgr->createLight("Light")->setPosition(75,75,75);
 
 	Ogre::DotSceneLoader* pDotSceneLoader = new Ogre::DotSceneLoader();
-	pDotSceneLoader->parseDotScene(m_LevelName + ".xml", "General", m_pSceneMgr, m_pSceneMgr->getRootSceneNode());
+	pDotSceneLoader->parseDotScene(m_LevelName + ".xml", "General", m_pSceneMgr, physicsWorld, m_pSceneMgr->getRootSceneNode());
 }
 
 bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
@@ -302,7 +302,7 @@ void GameState::update(double timeSinceLastFrame)
 	m_TranslateVector = Vector3::ZERO;
 
     // Update Bullet
-    Globals::phyWorld->stepSimulation(timeSinceLastFrame, 10);
+    physicsWorld->stepSimulation(timeSinceLastFrame, 10);
 
 	getInput();
 	moveCamera();

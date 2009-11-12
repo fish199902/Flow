@@ -5,11 +5,12 @@
 using namespace std;
 using namespace Ogre;
 
-void DotSceneLoader::parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, SceneNode *pAttachNode, const String &sPrependNode)
+void DotSceneLoader::parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, btDiscreteDynamicsWorld *physWorld, SceneNode *pAttachNode, const String &sPrependNode)
 {
 	// set up shared object values
 	m_sGroupName = groupName;
 	mSceneMgr = yourSceneMgr;
+	physicsWorld = physWorld;
 	m_sPrependNode = sPrependNode;
 	staticObjects.clear();
 	dynamicObjects.clear();
@@ -623,37 +624,62 @@ void DotSceneLoader::processEntity(TiXmlElement *XMLNode, SceneNode *pParent)
 	if(pElement)
 		processUserDataReference(pElement, pEntity);
 
-    pElement = XMLNote->FirstChildElement("physics");
+    pElement = XMLNode->FirstChildElement("physics");
     if(pElement)
-        processPhysics(pElement, pEntity);
+        processPhysics(pElement, pEntity, pParent);
 
 }
 
-void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity)
+void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity, SceneNode *pNode)
 {
     BtOgre::StaticMeshToShapeConverter converter(pEntity);
 
     /// \todo Check for memory leaks, and make sure things created here are fixed in place
 
     btCollisionShape* shape;
+    btScalar mass;
     String shapeType = getAttrib(XMLNode, "shape");
     if (shapeType == "box")
-        shape = converter.createBox():
+        shape = converter.createBox();
 
     else if (shapeType == "sphere")
         shape = converter.createSphere();
 
-    else if (shapeType == "cylinder"}
+    else if (shapeType == "cylinder")
         shape = converter.createCylinder();
 
     else
         shape = converter.createTrimesh();
 
-    //Create MotionState
-    btDefaultMotionState* state = new btDefaultMotionState(
-	    btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));
+    String massString = getAttrib(XMLNode, "mass");
+    if (mass) {
+        istringstream massStream(massString);
+        massStream >> mass;
+    }
+    else
+        mass = 0;
 
-	physicsWorld->addRigidBody(new btRigidBody(0, state, shape, btVector3(0,0,0)))
+    if ((float) mass == 0) {
+        // Create MotionState, this object will not move in the game
+        btDefaultMotionState *groundState = new btDefaultMotionState(
+            btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));
+
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Adding physics RigidBody: " + shapeType + " no mass");
+        physicsWorld->addRigidBody(new btRigidBody(mass, groundState, shape, btVector3(0,0,0)));
+    }
+    else {
+        // Conect Ogre to Bullet
+        btVector3 intertia;
+        shape->calculateLocalInertia(mass, intertia);
+
+        BtOgre::RigidBodyState *groundState = new BtOgre::RigidBodyState(pNode);
+
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Adding physics RigidBody: " + shapeType + " mass of " + massString);
+        physicsWorld->addRigidBody(new btRigidBody(mass, groundState, shape, btVector3(0,0,0)));
+    }
+
+	//btRigidBody* body = new btRigidBody(0, groundState, shape, btVector3(0,0,0));
+    //physicsWorld->addRigidBody(body);
 }
 
 void DotSceneLoader::processParticleSystem(TiXmlElement *XMLNode, SceneNode *pParent)
