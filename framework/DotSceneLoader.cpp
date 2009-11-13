@@ -659,24 +659,14 @@ void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity, Scen
     else
         mass = 0;
 
-    if ((float) mass == 0) {
-        // Create MotionState, this object will not move in the game
-        btDefaultMotionState *groundState = new btDefaultMotionState(
-            btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));
+    // Conect Ogre to Bullet
+    btVector3 intertia;
+    shape->calculateLocalInertia(mass, intertia);
 
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Adding physics RigidBody: " + shapeType + " no mass");
-        physicsWorld->addRigidBody(new btRigidBody(mass, groundState, shape, btVector3(0,0,0)));
-    }
-    else {
-        // Conect Ogre to Bullet
-        btVector3 intertia;
-        shape->calculateLocalInertia(mass, intertia);
+    BtOgre::RigidBodyState *groundState = new BtOgre::RigidBodyState(pNode);
 
-        BtOgre::RigidBodyState *groundState = new BtOgre::RigidBodyState(pNode);
-
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Adding physics RigidBody: " + shapeType + " mass of " + massString);
-        physicsWorld->addRigidBody(new btRigidBody(mass, groundState, shape, btVector3(0,0,0)));
-    }
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Adding physics RigidBody: " + shapeType + ", mass of " + massString);
+    physicsWorld->addRigidBody(new btRigidBody(mass, groundState, shape, btVector3(0,0,0)));
 
 	//btRigidBody* body = new btRigidBody(0, groundState, shape, btVector3(0,0,0));
     //physicsWorld->addRigidBody(body);

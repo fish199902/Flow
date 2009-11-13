@@ -135,16 +135,16 @@ bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
 		return true;
 	}
 
+    // Show debug overlay if shift-ctrl-/ is pressed
 	if (m_pKeyboard->isKeyDown(OIS::KC_RCONTROL) &&
-        m_pKeyboard->isKeyDown(OIS::KC_RSHIFT) &&
-        m_pKeyboard->isKeyDown(OIS::KC_SLASH))
+        m_pKeyboard->isKeyDown(OIS::KC_F12))
 	{
 		if(m_pDebugOverlay)
 		{
-			if(!m_pDebugOverlay->isVisible())
-				m_pDebugOverlay->show();
-			else
-				m_pDebugOverlay->hide();
+            if(!m_pDebugOverlay->isVisible())
+                m_pDebugOverlay->show();
+            else
+                m_pDebugOverlay->hide();
 		}
 	}
 

@@ -92,6 +92,7 @@ void GameState::enter()
     // btOgre Stuff
     physicsDebug = new BtOgre::DebugDrawer(m_pSceneMgr->getRootSceneNode(), physicsWorld);
 	physicsWorld->setDebugDrawer(physicsDebug);
+	physicsDebug->setDebugMode(false);
 
 	createScene();
 }
@@ -168,6 +169,13 @@ bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		return true;
 	}
 
+    if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_RCONTROL) &&
+       OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_F12))
+    {
+        // Toggle debug physics
+        physicsDebug->setDebugMode(!physicsDebug->getDebugMode());
+    }
+
     OgreFramework::getSingletonPtr()->keyPressed(keyEventRef);
 
 	return true;
@@ -237,6 +245,8 @@ void GameState::moveCamera()
  */
 void GameState::getInput()
 {
+    // Camera motion
+
 	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_A))
 	{
 		m_TranslateVector.x = -m_MoveScale;
@@ -267,22 +277,25 @@ void GameState::getInput()
 		m_TranslateVector.y = m_MoveScale;
 	}
 
-	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_LEFT))
+
+	// Camera rotation
+
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_NUMPAD1))
 	{
 		m_pCamera->yaw(m_RotScale);
 	}
 
-	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_RIGHT))
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_NUMPAD3))
 	{
 		m_pCamera->yaw(-m_RotScale);
 	}
 
-	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_UP))
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_NUMPAD5))
 	{
 		m_pCamera->pitch(m_RotScale);
 	}
 
-	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_DOWN))
+	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_NUMPAD2))
 	{
 		m_pCamera->pitch(-m_RotScale);
 	}
@@ -303,9 +316,12 @@ void GameState::update(double timeSinceLastFrame)
 
     // Update Bullet
     physicsWorld->stepSimulation(timeSinceLastFrame, 10);
+    physicsWorld->debugDrawWorld();
 
 	getInput();
 	moveCamera();
+
+	physicsDebug->step();
 }
 
 void GameState::setBufferedMode()
@@ -338,15 +354,24 @@ void GameState::setUnbufferedMode()
 	pModeCaption->setText("Unuffered Input Mode");
 
 	CEGUI::MultiLineEditbox* pControlsPanel = (CEGUI::MultiLineEditbox*)m_pMainWnd->getChild("ControlsPanel");
-	pControlsPanel->setText("[Tab] - To switch between input modes\n\n"
+	pControlsPanel->setText("Look Controls:\n"
+                            "[NUM1] - Left\n"
+                            "[NUM2] - Down\n"
+                            "[NUM3] - Right\n"
+                            "[NUM5] - Up\n"
+                            "\n"
+                            "Move Camera:\n"
                             "[W] - Forward\n"
                             "[S] - Backwards\n"
                             "[A] - Left\n"
                             "[D] - Right\n"
+                            "[E] - Move Up\n"
+                            "[C] - Move Down\n"
                             "\n"
-                            "Press [Shift] to move faster\n"
+                            "Press [Shift] to move camera faster\n"
                             "\n"
-                            "[O] - Toggle Overlays\n"
+                            "[R-CTRL]+[F12] - Toggle Debug"
+                            "\n"
                             "[Print] - Take screenshot\n"
                             "\n"
                             "[Esc] - Quit to main menu");
