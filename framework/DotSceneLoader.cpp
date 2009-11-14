@@ -1,3 +1,21 @@
+/* Copyright 2009 Austin Brown
+ *
+ * This file is part of Flow.
+ *
+ * Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Flow.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "DotSceneLoader.hpp"
 #include "../tinyxml/tinyxml.h"
 #include <Ogre.h>
@@ -7,625 +25,693 @@ using namespace Ogre;
 
 void DotSceneLoader::parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, btDiscreteDynamicsWorld *physWorld, SceneNode *pAttachNode, const String &sPrependNode)
 {
-	// set up shared object values
-	m_sGroupName = groupName;
-	mSceneMgr = yourSceneMgr;
-	physicsWorld = physWorld;
-	m_sPrependNode = sPrependNode;
-	staticObjects.clear();
-	dynamicObjects.clear();
+    // set up shared object values
+    m_sGroupName = groupName;
+    mSceneMgr = yourSceneMgr;
+    physicsWorld = physWorld;
+    m_sPrependNode = sPrependNode;
+    staticObjects.clear();
+    dynamicObjects.clear();
 
-	TiXmlDocument   *XMLDoc = 0;
-	TiXmlElement   *XMLRoot;
+    TiXmlDocument   *XMLDoc = 0;
+    TiXmlElement   *XMLRoot;
 
-	try
-	{
-		// Strip the path
-		Ogre::String basename, path;
-		Ogre::StringUtil::splitFilename(SceneName, basename, path);
+    try
+    {
+        // Strip the path
+        Ogre::String basename, path;
+        Ogre::StringUtil::splitFilename(SceneName, basename, path);
 
-		DataStreamPtr pStream = ResourceGroupManager::getSingleton().
-			openResource( basename, groupName );
+        DataStreamPtr pStream = ResourceGroupManager::getSingleton().
+                                openResource(basename, groupName);
 
-		//DataStreamPtr pStream = ResourceGroupManager::getSingleton().
-		//	openResource( SceneName, groupName );
+        //DataStreamPtr pStream = ResourceGroupManager::getSingleton().
+        //  openResource( SceneName, groupName );
 
-		String data = pStream->getAsString();
-		// Open the .scene File
-		XMLDoc = new TiXmlDocument();
-		XMLDoc->Parse( data.c_str() );
-		pStream->close();
-		pStream.setNull();
+        String data = pStream->getAsString();
+        // Open the .scene File
+        XMLDoc = new TiXmlDocument();
+        XMLDoc->Parse(data.c_str());
+        pStream->close();
+        pStream.setNull();
 
-		if( XMLDoc->Error() )
-		{
-			//We'll just log, and continue on gracefully
-			LogManager::getSingleton().logMessage("[DotSceneLoader] The TiXmlDocument reported an error");
-			delete XMLDoc;
-			return;
-		}
-	}
-	catch(...)
-	{
-		//We'll just log, and continue on gracefully
-		LogManager::getSingleton().logMessage("[DotSceneLoader] Error creating TiXmlDocument");
-		delete XMLDoc;
-		return;
-	}
+        if (XMLDoc->Error())
+        {
+            //We'll just log, and continue on gracefully
+            LogManager::getSingleton().logMessage("[DotSceneLoader] The TiXmlDocument reported an error");
+            delete XMLDoc;
+            return;
+        }
+    }
+    catch (...)
+    {
+        //We'll just log, and continue on gracefully
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error creating TiXmlDocument");
+        delete XMLDoc;
+        return;
+    }
 
-	// Validate the File
-	XMLRoot = XMLDoc->RootElement();
-	if( String( XMLRoot->Value()) != "scene"  ) {
-		LogManager::getSingleton().logMessage( "[DotSceneLoader] Error: Invalid .scene File. Missing <scene>" );
-		delete XMLDoc;
-		return;
-	}
+    // Validate the File
+    XMLRoot = XMLDoc->RootElement();
 
-	// figure out where to attach any nodes we create
-	mAttachNode = pAttachNode;
-	if(!mAttachNode)
-		mAttachNode = mSceneMgr->getRootSceneNode();
+    if (String(XMLRoot->Value()) != "scene")
+    {
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error: Invalid .scene File. Missing <scene>");
+        delete XMLDoc;
+        return;
+    }
 
-	// Process the scene
-	processScene(XMLRoot);
+    // figure out where to attach any nodes we create
+    mAttachNode = pAttachNode;
 
-	// Close the XML File
-	delete XMLDoc;
+    if (!mAttachNode)
+        mAttachNode = mSceneMgr->getRootSceneNode();
+
+    // Process the scene
+    processScene(XMLRoot);
+
+    // Close the XML File
+    delete XMLDoc;
 }
 
 void DotSceneLoader::processScene(TiXmlElement *XMLRoot)
 {
-	// Process the scene parameters
-	String version = getAttrib(XMLRoot, "formatVersion", "unknown");
+    // Process the scene parameters
+    String version = getAttrib(XMLRoot, "formatVersion", "unknown");
 
-	String message = "[DotSceneLoader] Parsing dotScene file with version " + version;
-	if(XMLRoot->Attribute("ID"))
-		message += ", id " + String(XMLRoot->Attribute("ID"));
-	if(XMLRoot->Attribute("sceneManager"))
-		message += ", scene manager " + String(XMLRoot->Attribute("sceneManager"));
-	if(XMLRoot->Attribute("minOgreVersion"))
-		message += ", min. Ogre version " + String(XMLRoot->Attribute("minOgreVersion"));
-	if(XMLRoot->Attribute("author"))
-		message += ", author " + String(XMLRoot->Attribute("author"));
+    String message = "[DotSceneLoader] Parsing dotScene file with version " + version;
 
-	LogManager::getSingleton().logMessage(message);
+    if (XMLRoot->Attribute("ID"))
+        message += ", id " + String(XMLRoot->Attribute("ID"));
 
-	TiXmlElement *pElement;
+    if (XMLRoot->Attribute("sceneManager"))
+        message += ", scene manager " + String(XMLRoot->Attribute("sceneManager"));
 
-	// Process nodes (?)
-	pElement = XMLRoot->FirstChildElement("nodes");
-	if(pElement)
-		processNodes(pElement);
+    if (XMLRoot->Attribute("minOgreVersion"))
+        message += ", min. Ogre version " + String(XMLRoot->Attribute("minOgreVersion"));
 
-	// Process externals (?)
-	pElement = XMLRoot->FirstChildElement("externals");
-	if(pElement)
-		processExternals(pElement);
+    if (XMLRoot->Attribute("author"))
+        message += ", author " + String(XMLRoot->Attribute("author"));
 
-	// Process environment (?)
-	pElement = XMLRoot->FirstChildElement("environment");
-	if(pElement)
-		processEnvironment(pElement);
+    LogManager::getSingleton().logMessage(message);
 
-	// Process terrain (?)
-	pElement = XMLRoot->FirstChildElement("terrain");
-	if(pElement)
-		processTerrain(pElement);
+    TiXmlElement *pElement;
 
-	// Process userDataReference (?)
-	pElement = XMLRoot->FirstChildElement("userDataReference");
-	if(pElement)
-		processUserDataReference(pElement);
+    // Process nodes (?)
+    pElement = XMLRoot->FirstChildElement("nodes");
 
-	// Process octree (?)
-	pElement = XMLRoot->FirstChildElement("octree");
-	if(pElement)
-		processOctree(pElement);
+    if (pElement)
+        processNodes(pElement);
 
-	// Process light (?)
-	pElement = XMLRoot->FirstChildElement("light");
-	if(pElement)
-		processLight(pElement);
+    // Process externals (?)
+    pElement = XMLRoot->FirstChildElement("externals");
 
-	// Process camera (?)
-	pElement = XMLRoot->FirstChildElement("camera");
-	if(pElement)
-		processCamera(pElement);
+    if (pElement)
+        processExternals(pElement);
+
+    // Process environment (?)
+    pElement = XMLRoot->FirstChildElement("environment");
+
+    if (pElement)
+        processEnvironment(pElement);
+
+    // Process terrain (?)
+    pElement = XMLRoot->FirstChildElement("terrain");
+
+    if (pElement)
+        processTerrain(pElement);
+
+    // Process userDataReference (?)
+    pElement = XMLRoot->FirstChildElement("userDataReference");
+
+    if (pElement)
+        processUserDataReference(pElement);
+
+    // Process octree (?)
+    pElement = XMLRoot->FirstChildElement("octree");
+
+    if (pElement)
+        processOctree(pElement);
+
+    // Process light (?)
+    pElement = XMLRoot->FirstChildElement("light");
+
+    if (pElement)
+        processLight(pElement);
+
+    // Process camera (?)
+    pElement = XMLRoot->FirstChildElement("camera");
+
+    if (pElement)
+        processCamera(pElement);
 }
 
 void DotSceneLoader::processNodes(TiXmlElement *XMLNode)
 {
-	TiXmlElement *pElement;
+    TiXmlElement *pElement;
 
-	// Process node (*)
-	pElement = XMLNode->FirstChildElement("node");
-	while(pElement)
-	{
-		processNode(pElement);
-		pElement = pElement->NextSiblingElement("node");
-	}
+    // Process node (*)
+    pElement = XMLNode->FirstChildElement("node");
 
-	// Process position (?)
-	pElement = XMLNode->FirstChildElement("position");
-	if(pElement)
-	{
-		mAttachNode->setPosition(parseVector3(pElement));
-		mAttachNode->setInitialState();
-	}
+    while (pElement)
+    {
+        processNode(pElement);
+        pElement = pElement->NextSiblingElement("node");
+    }
 
-	// Process rotation (?)
-	pElement = XMLNode->FirstChildElement("rotation");
-	if(pElement)
-	{
-		mAttachNode->setOrientation(parseQuaternion(pElement));
-		mAttachNode->setInitialState();
-	}
+    // Process position (?)
+    pElement = XMLNode->FirstChildElement("position");
 
-	// Process scale (?)
-	pElement = XMLNode->FirstChildElement("scale");
-	if(pElement)
-	{
-		mAttachNode->setScale(parseVector3(pElement));
-		mAttachNode->setInitialState();
-	}
+    if (pElement)
+    {
+        mAttachNode->setPosition(parseVector3(pElement));
+        mAttachNode->setInitialState();
+    }
+
+    // Process rotation (?)
+    pElement = XMLNode->FirstChildElement("rotation");
+
+    if (pElement)
+    {
+        mAttachNode->setOrientation(parseQuaternion(pElement));
+        mAttachNode->setInitialState();
+    }
+
+    // Process scale (?)
+    pElement = XMLNode->FirstChildElement("scale");
+
+    if (pElement)
+    {
+        mAttachNode->setScale(parseVector3(pElement));
+        mAttachNode->setInitialState();
+    }
 }
 
 void DotSceneLoader::processExternals(TiXmlElement *XMLNode)
 {
-	//! @todo Implement this
+    //! @todo Implement this
 }
 
 void DotSceneLoader::processEnvironment(TiXmlElement *XMLNode)
 {
-	TiXmlElement *pElement;
+    TiXmlElement *pElement;
 
-	// Process fog (?)
-	pElement = XMLNode->FirstChildElement("fog");
-	if(pElement)
-		processFog(pElement);
+    // Process fog (?)
+    pElement = XMLNode->FirstChildElement("fog");
 
-	// Process skyBox (?)
-	pElement = XMLNode->FirstChildElement("skyBox");
-	if(pElement)
-		processSkyBox(pElement);
+    if (pElement)
+        processFog(pElement);
 
-	// Process skyDome (?)
-	pElement = XMLNode->FirstChildElement("skyDome");
-	if(pElement)
-		processSkyDome(pElement);
+    // Process skyBox (?)
+    pElement = XMLNode->FirstChildElement("skyBox");
 
-	// Process skyPlane (?)
-	pElement = XMLNode->FirstChildElement("skyPlane");
-	if(pElement)
-		processSkyPlane(pElement);
+    if (pElement)
+        processSkyBox(pElement);
 
-	// Process clipping (?)
-	pElement = XMLNode->FirstChildElement("clipping");
-	if(pElement)
-		processClipping(pElement);
+    // Process skyDome (?)
+    pElement = XMLNode->FirstChildElement("skyDome");
 
-	// Process colourAmbient (?)
-	pElement = XMLNode->FirstChildElement("colourAmbient");
-	if(pElement)
-		mSceneMgr->setAmbientLight(parseColour(pElement));
+    if (pElement)
+        processSkyDome(pElement);
 
-	// Process colourBackground (?)
-	//! @todo Set the background colour of all viewports (RenderWindow has to be provided then)
-	pElement = XMLNode->FirstChildElement("colourBackground");
-	if(pElement)
-		;//mSceneMgr->set(parseColour(pElement));
+    // Process skyPlane (?)
+    pElement = XMLNode->FirstChildElement("skyPlane");
 
-	// Process userDataReference (?)
-	pElement = XMLNode->FirstChildElement("userDataReference");
-	if(pElement)
-		processUserDataReference(pElement);
+    if (pElement)
+        processSkyPlane(pElement);
+
+    // Process clipping (?)
+    pElement = XMLNode->FirstChildElement("clipping");
+
+    if (pElement)
+        processClipping(pElement);
+
+    // Process colourAmbient (?)
+    pElement = XMLNode->FirstChildElement("colourAmbient");
+
+    if (pElement)
+        mSceneMgr->setAmbientLight(parseColour(pElement));
+
+    // Process colourBackground (?)
+    //! @todo Set the background colour of all viewports (RenderWindow has to be provided then)
+    pElement = XMLNode->FirstChildElement("colourBackground");
+
+    if (pElement)
+        ;//mSceneMgr->set(parseColour(pElement));
+
+    // Process userDataReference (?)
+    pElement = XMLNode->FirstChildElement("userDataReference");
+
+    if (pElement)
+        processUserDataReference(pElement);
 }
 
 void DotSceneLoader::processTerrain(TiXmlElement *XMLNode)
 {
-	//! @todo Implement this
+    //! @todo Implement this
 }
 
 void DotSceneLoader::processUserDataReference(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	//! @todo Implement this
+    //! @todo Implement this
 }
 
 void DotSceneLoader::processOctree(TiXmlElement *XMLNode)
 {
-	//! @todo Implement this
+    //! @todo Implement this
 }
 
 void DotSceneLoader::processLight(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	// Process attributes
-	String name = getAttrib(XMLNode, "name");
-	String id = getAttrib(XMLNode, "id");
+    // Process attributes
+    String name = getAttrib(XMLNode, "name");
+    String id = getAttrib(XMLNode, "id");
 
-	// Create the light
-	Light *pLight = mSceneMgr->createLight(name);
-	if(pParent)
-		pParent->attachObject(pLight);
+    // Create the light
+    Light *pLight = mSceneMgr->createLight(name);
 
-	String sValue = getAttrib(XMLNode, "type");
-	if(sValue == "point")
-		pLight->setType(Light::LT_POINT);
-	else if(sValue == "directional")
-		pLight->setType(Light::LT_DIRECTIONAL);
-	else if(sValue == "spot")
-		pLight->setType(Light::LT_SPOTLIGHT);
-	else if(sValue == "radPoint")
-		pLight->setType(Light::LT_POINT);
+    if (pParent)
+        pParent->attachObject(pLight);
 
-	pLight->setVisible(getAttribBool(XMLNode, "visible", true));
-	pLight->setCastShadows(getAttribBool(XMLNode, "castShadows", true));
+    String sValue = getAttrib(XMLNode, "type");
 
-	TiXmlElement *pElement;
+    if (sValue == "point")
+        pLight->setType(Light::LT_POINT);
+    else if (sValue == "directional")
+        pLight->setType(Light::LT_DIRECTIONAL);
+    else if (sValue == "spot")
+        pLight->setType(Light::LT_SPOTLIGHT);
+    else if (sValue == "radPoint")
+        pLight->setType(Light::LT_POINT);
 
-	// Process position (?)
-	pElement = XMLNode->FirstChildElement("position");
-	if(pElement)
-		pLight->setPosition(parseVector3(pElement));
+    pLight->setVisible(getAttribBool(XMLNode, "visible", true));
+    pLight->setCastShadows(getAttribBool(XMLNode, "castShadows", true));
 
-	// Process normal (?)
-	pElement = XMLNode->FirstChildElement("normal");
-	if(pElement)
-		pLight->setDirection(parseVector3(pElement));
+    TiXmlElement *pElement;
 
-	// Process colourDiffuse (?)
-	pElement = XMLNode->FirstChildElement("colourDiffuse");
-	if(pElement)
-		pLight->setDiffuseColour(parseColour(pElement));
+    // Process position (?)
+    pElement = XMLNode->FirstChildElement("position");
 
-	// Process colourSpecular (?)
-	pElement = XMLNode->FirstChildElement("colourSpecular");
-	if(pElement)
-		pLight->setSpecularColour(parseColour(pElement));
+    if (pElement)
+        pLight->setPosition(parseVector3(pElement));
 
-	// Process lightRange (?)
-	pElement = XMLNode->FirstChildElement("lightRange");
-	if(pElement)
-		processLightRange(pElement, pLight);
+    // Process normal (?)
+    pElement = XMLNode->FirstChildElement("normal");
 
-	// Process lightAttenuation (?)
-	pElement = XMLNode->FirstChildElement("lightAttenuation");
-	if(pElement)
-		processLightAttenuation(pElement, pLight);
+    if (pElement)
+        pLight->setDirection(parseVector3(pElement));
 
-	// Process userDataReference (?)
-	pElement = XMLNode->FirstChildElement("userDataReference");
-	if(pElement)
-		;//processUserDataReference(pElement, pLight);
+    // Process colourDiffuse (?)
+    pElement = XMLNode->FirstChildElement("colourDiffuse");
+
+    if (pElement)
+        pLight->setDiffuseColour(parseColour(pElement));
+
+    // Process colourSpecular (?)
+    pElement = XMLNode->FirstChildElement("colourSpecular");
+
+    if (pElement)
+        pLight->setSpecularColour(parseColour(pElement));
+
+    // Process lightRange (?)
+    pElement = XMLNode->FirstChildElement("lightRange");
+
+    if (pElement)
+        processLightRange(pElement, pLight);
+
+    // Process lightAttenuation (?)
+    pElement = XMLNode->FirstChildElement("lightAttenuation");
+
+    if (pElement)
+        processLightAttenuation(pElement, pLight);
+
+    // Process userDataReference (?)
+    pElement = XMLNode->FirstChildElement("userDataReference");
+
+    if (pElement)
+        ;//processUserDataReference(pElement, pLight);
 }
 
 void DotSceneLoader::processCamera(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	// Process attributes
-	String name = getAttrib(XMLNode, "name");
-	String id = getAttrib(XMLNode, "id");
-	Real fov = getAttribReal(XMLNode, "fov", 45);
-	Real aspectRatio = getAttribReal(XMLNode, "aspectRatio", 1.3333);
-	String projectionType = getAttrib(XMLNode, "projectionType", "perspective");
+    // Process attributes
+    String name = getAttrib(XMLNode, "name");
+    String id = getAttrib(XMLNode, "id");
+    Real fov = getAttribReal(XMLNode, "fov", 45);
+    Real aspectRatio = getAttribReal(XMLNode, "aspectRatio", 1.3333);
+    String projectionType = getAttrib(XMLNode, "projectionType", "perspective");
 
-	// Create the camera
-	Camera *pCamera = mSceneMgr->createCamera(name);
-	if(pParent)
-		pParent->attachObject(pCamera);
+    // Create the camera
+    Camera *pCamera = mSceneMgr->createCamera(name);
 
-	// Set the field-of-view
-	//! @todo Is this always in degrees?
-	pCamera->setFOVy(Ogre::Degree(fov));
+    if (pParent)
+        pParent->attachObject(pCamera);
 
-	// Set the aspect ratio
-	pCamera->setAspectRatio(aspectRatio);
+    // Set the field-of-view
+    //! @todo Is this always in degrees?
+    pCamera->setFOVy(Ogre::Degree(fov));
 
-	// Set the projection type
-	if(projectionType == "perspective")
-		pCamera->setProjectionType(PT_PERSPECTIVE);
-	else if(projectionType == "orthographic")
-		pCamera->setProjectionType(PT_ORTHOGRAPHIC);
+    // Set the aspect ratio
+    pCamera->setAspectRatio(aspectRatio);
+
+    // Set the projection type
+    if (projectionType == "perspective")
+        pCamera->setProjectionType(PT_PERSPECTIVE);
+    else if (projectionType == "orthographic")
+        pCamera->setProjectionType(PT_ORTHOGRAPHIC);
 
 
-	TiXmlElement *pElement;
+    TiXmlElement *pElement;
 
-	// Process clipping (?)
-	pElement = XMLNode->FirstChildElement("clipping");
-	if(pElement)
-	{
-		Real nearDist = getAttribReal(pElement, "near");
-		pCamera->setNearClipDistance(nearDist);
+    // Process clipping (?)
+    pElement = XMLNode->FirstChildElement("clipping");
 
-		Real farDist =  getAttribReal(pElement, "far");
-		pCamera->setFarClipDistance(farDist);
-	}
+    if (pElement)
+    {
+        Real nearDist = getAttribReal(pElement, "near");
+        pCamera->setNearClipDistance(nearDist);
 
-	// Process position (?)
-	pElement = XMLNode->FirstChildElement("position");
-	if(pElement)
-		pCamera->setPosition(parseVector3(pElement));
+        Real farDist =  getAttribReal(pElement, "far");
+        pCamera->setFarClipDistance(farDist);
+    }
 
-	// Process rotation (?)
-	pElement = XMLNode->FirstChildElement("rotation");
-	if(pElement)
-		pCamera->setOrientation(parseQuaternion(pElement));
+    // Process position (?)
+    pElement = XMLNode->FirstChildElement("position");
 
-	// Process normal (?)
-	pElement = XMLNode->FirstChildElement("normal");
-	if(pElement)
-		;//!< @todo What to do with this element?
+    if (pElement)
+        pCamera->setPosition(parseVector3(pElement));
 
-	// Process lookTarget (?)
-	pElement = XMLNode->FirstChildElement("lookTarget");
-	if(pElement)
-		;//!< @todo Implement the camera look target
+    // Process rotation (?)
+    pElement = XMLNode->FirstChildElement("rotation");
 
-	// Process trackTarget (?)
-	pElement = XMLNode->FirstChildElement("trackTarget");
-	if(pElement)
-		;//!< @todo Implement the camera track target
+    if (pElement)
+        pCamera->setOrientation(parseQuaternion(pElement));
 
-	// Process userDataReference (?)
-	pElement = XMLNode->FirstChildElement("userDataReference");
-	if(pElement)
-		;//!< @todo Implement the camera user data reference
+    // Process normal (?)
+    pElement = XMLNode->FirstChildElement("normal");
+
+    if (pElement)
+        ;//!< @todo What to do with this element?
+
+    // Process lookTarget (?)
+    pElement = XMLNode->FirstChildElement("lookTarget");
+
+    if (pElement)
+        ;//!< @todo Implement the camera look target
+
+    // Process trackTarget (?)
+    pElement = XMLNode->FirstChildElement("trackTarget");
+
+    if (pElement)
+        ;//!< @todo Implement the camera track target
+
+    // Process userDataReference (?)
+    pElement = XMLNode->FirstChildElement("userDataReference");
+
+    if (pElement)
+        ;//!< @todo Implement the camera user data reference
 }
 
 void DotSceneLoader::processNode(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	// Construct the node's name
-	String name = m_sPrependNode + getAttrib(XMLNode, "name");
+    // Construct the node's name
+    String name = m_sPrependNode + getAttrib(XMLNode, "name");
 
-	// Create the scene node
-	SceneNode *pNode;
-	if(name.empty())
-	{
-		// Let Ogre choose the name
-		if(pParent)
-			pNode = pParent->createChildSceneNode();
-		else
-			pNode = mAttachNode->createChildSceneNode();
-	}
-	else
-	{
-		// Provide the name
-		if(pParent)
-			pNode = pParent->createChildSceneNode(name);
-		else
-			pNode = mAttachNode->createChildSceneNode(name);
-	}
+    // Create the scene node
+    SceneNode *pNode;
 
-	// Process other attributes
-	String id = getAttrib(XMLNode, "id");
-	bool isTarget = getAttribBool(XMLNode, "isTarget");
+    if (name.empty())
+    {
+        // Let Ogre choose the name
+        if (pParent)
+            pNode = pParent->createChildSceneNode();
+        else
+            pNode = mAttachNode->createChildSceneNode();
+    }
+    else
+    {
+        // Provide the name
+        if (pParent)
+            pNode = pParent->createChildSceneNode(name);
+        else
+            pNode = mAttachNode->createChildSceneNode(name);
+    }
 
-	TiXmlElement *pElement;
+    // Process other attributes
+    String id = getAttrib(XMLNode, "id");
+    bool isTarget = getAttribBool(XMLNode, "isTarget");
 
-	// Process position (?)
-	pElement = XMLNode->FirstChildElement("position");
-	if(pElement)
-	{
-		pNode->setPosition(parseVector3(pElement));
-		pNode->setInitialState();
-	}
+    TiXmlElement *pElement;
 
-	// Process rotation (?)
-	pElement = XMLNode->FirstChildElement("rotation");
-	if(pElement)
-	{
-		pNode->setOrientation(parseQuaternion(pElement));
-		pNode->setInitialState();
-	}
+    // Process position (?)
+    pElement = XMLNode->FirstChildElement("position");
 
-	// Process scale (?)
-	pElement = XMLNode->FirstChildElement("scale");
-	if(pElement)
-	{
-		pNode->setScale(parseVector3(pElement));
-		pNode->setInitialState();
-	}
+    if (pElement)
+    {
+        pNode->setPosition(parseVector3(pElement));
+        pNode->setInitialState();
+    }
 
-	// Process lookTarget (?)
-	pElement = XMLNode->FirstChildElement("lookTarget");
-	if(pElement)
-		processLookTarget(pElement, pNode);
+    // Process rotation (?)
+    pElement = XMLNode->FirstChildElement("rotation");
 
-	// Process trackTarget (?)
-	pElement = XMLNode->FirstChildElement("trackTarget");
-	if(pElement)
-		processTrackTarget(pElement, pNode);
+    if (pElement)
+    {
+        pNode->setOrientation(parseQuaternion(pElement));
+        pNode->setInitialState();
+    }
 
-	// Process node (*)
-	pElement = XMLNode->FirstChildElement("node");
-	while(pElement)
-	{
-		processNode(pElement, pNode);
-		pElement = pElement->NextSiblingElement("node");
-	}
+    // Process scale (?)
+    pElement = XMLNode->FirstChildElement("scale");
 
-	// Process entity (*)
-	pElement = XMLNode->FirstChildElement("entity");
-	while(pElement)
-	{
-		processEntity(pElement, pNode);
-		pElement = pElement->NextSiblingElement("entity");
-	}
+    if (pElement)
+    {
+        pNode->setScale(parseVector3(pElement));
+        pNode->setInitialState();
+    }
 
-	// Process light (*)
-	pElement = XMLNode->FirstChildElement("light");
-	while(pElement)
-	{
-		processLight(pElement, pNode);
-		pElement = pElement->NextSiblingElement("light");
-	}
+    // Process lookTarget (?)
+    pElement = XMLNode->FirstChildElement("lookTarget");
 
-	// Process camera (*)
-	pElement = XMLNode->FirstChildElement("camera");
-	while(pElement)
-	{
-		processCamera(pElement, pNode);
-		pElement = pElement->NextSiblingElement("camera");
-	}
+    if (pElement)
+        processLookTarget(pElement, pNode);
 
-	// Process particleSystem (*)
-	pElement = XMLNode->FirstChildElement("particleSystem");
-	while(pElement)
-	{
-		processParticleSystem(pElement, pNode);
-		pElement = pElement->NextSiblingElement("particleSystem");
-	}
+    // Process trackTarget (?)
+    pElement = XMLNode->FirstChildElement("trackTarget");
 
-	// Process billboardSet (*)
-	pElement = XMLNode->FirstChildElement("billboardSet");
-	while(pElement)
-	{
-		processBillboardSet(pElement, pNode);
-		pElement = pElement->NextSiblingElement("billboardSet");
-	}
+    if (pElement)
+        processTrackTarget(pElement, pNode);
 
-	// Process plane (*)
-	pElement = XMLNode->FirstChildElement("plane");
-	while(pElement)
-	{
-		processPlane(pElement, pNode);
-		pElement = pElement->NextSiblingElement("plane");
-	}
+    // Process node (*)
+    pElement = XMLNode->FirstChildElement("node");
 
-	// Process userDataReference (?)
-	pElement = XMLNode->FirstChildElement("userDataReference");
-	if(pElement)
-		processUserDataReference(pElement, pNode);
+    while (pElement)
+    {
+        processNode(pElement, pNode);
+        pElement = pElement->NextSiblingElement("node");
+    }
+
+    // Process entity (*)
+    pElement = XMLNode->FirstChildElement("entity");
+
+    while (pElement)
+    {
+        processEntity(pElement, pNode);
+        pElement = pElement->NextSiblingElement("entity");
+    }
+
+    // Process light (*)
+    pElement = XMLNode->FirstChildElement("light");
+
+    while (pElement)
+    {
+        processLight(pElement, pNode);
+        pElement = pElement->NextSiblingElement("light");
+    }
+
+    // Process camera (*)
+    pElement = XMLNode->FirstChildElement("camera");
+
+    while (pElement)
+    {
+        processCamera(pElement, pNode);
+        pElement = pElement->NextSiblingElement("camera");
+    }
+
+    // Process particleSystem (*)
+    pElement = XMLNode->FirstChildElement("particleSystem");
+
+    while (pElement)
+    {
+        processParticleSystem(pElement, pNode);
+        pElement = pElement->NextSiblingElement("particleSystem");
+    }
+
+    // Process billboardSet (*)
+    pElement = XMLNode->FirstChildElement("billboardSet");
+
+    while (pElement)
+    {
+        processBillboardSet(pElement, pNode);
+        pElement = pElement->NextSiblingElement("billboardSet");
+    }
+
+    // Process plane (*)
+    pElement = XMLNode->FirstChildElement("plane");
+
+    while (pElement)
+    {
+        processPlane(pElement, pNode);
+        pElement = pElement->NextSiblingElement("plane");
+    }
+
+    // Process userDataReference (?)
+    pElement = XMLNode->FirstChildElement("userDataReference");
+
+    if (pElement)
+        processUserDataReference(pElement, pNode);
 }
 
 void DotSceneLoader::processLookTarget(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	//! @todo Is this correct? Cause I don't have a clue actually
+    //! @todo Is this correct? Cause I don't have a clue actually
 
-	// Process attributes
-	String nodeName = getAttrib(XMLNode, "nodeName");
+    // Process attributes
+    String nodeName = getAttrib(XMLNode, "nodeName");
 
-	Node::TransformSpace relativeTo = Node::TS_PARENT;
-	String sValue = getAttrib(XMLNode, "relativeTo");
-	if(sValue == "local")
-		relativeTo = Node::TS_LOCAL;
-	else if(sValue == "parent")
-		relativeTo = Node::TS_PARENT;
-	else if(sValue == "world")
-		relativeTo = Node::TS_WORLD;
+    Node::TransformSpace relativeTo = Node::TS_PARENT;
+    String sValue = getAttrib(XMLNode, "relativeTo");
 
-	TiXmlElement *pElement;
+    if (sValue == "local")
+        relativeTo = Node::TS_LOCAL;
+    else if (sValue == "parent")
+        relativeTo = Node::TS_PARENT;
+    else if (sValue == "world")
+        relativeTo = Node::TS_WORLD;
 
-	// Process position (?)
-	Vector3 position;
-	pElement = XMLNode->FirstChildElement("position");
-	if(pElement)
-		position = parseVector3(pElement);
+    TiXmlElement *pElement;
 
-	// Process localDirection (?)
-	Vector3 localDirection = Vector3::NEGATIVE_UNIT_Z;
-	pElement = XMLNode->FirstChildElement("localDirection");
-	if(pElement)
-		localDirection = parseVector3(pElement);
+    // Process position (?)
+    Vector3 position;
+    pElement = XMLNode->FirstChildElement("position");
 
-	// Setup the look target
-	try
-	{
-		if(!nodeName.empty())
-		{
-			SceneNode *pLookNode = mSceneMgr->getSceneNode(nodeName);
-			position = pLookNode->_getDerivedPosition();
-		}
+    if (pElement)
+        position = parseVector3(pElement);
 
-		pParent->lookAt(position, relativeTo, localDirection);
-	}
-	catch(Ogre::Exception &/*e*/)
-	{
-		LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a look target!");
-	}
+    // Process localDirection (?)
+    Vector3 localDirection = Vector3::NEGATIVE_UNIT_Z;
+    pElement = XMLNode->FirstChildElement("localDirection");
+
+    if (pElement)
+        localDirection = parseVector3(pElement);
+
+    // Setup the look target
+    try
+    {
+        if (!nodeName.empty())
+        {
+            SceneNode *pLookNode = mSceneMgr->getSceneNode(nodeName);
+            position = pLookNode->_getDerivedPosition();
+        }
+
+        pParent->lookAt(position, relativeTo, localDirection);
+    }
+    catch (Ogre::Exception &/*e*/)
+    {
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a look target!");
+    }
 }
 
 void DotSceneLoader::processTrackTarget(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	// Process attributes
-	String nodeName = getAttrib(XMLNode, "nodeName");
+    // Process attributes
+    String nodeName = getAttrib(XMLNode, "nodeName");
 
-	TiXmlElement *pElement;
+    TiXmlElement *pElement;
 
-	// Process localDirection (?)
-	Vector3 localDirection = Vector3::NEGATIVE_UNIT_Z;
-	pElement = XMLNode->FirstChildElement("localDirection");
-	if(pElement)
-		localDirection = parseVector3(pElement);
+    // Process localDirection (?)
+    Vector3 localDirection = Vector3::NEGATIVE_UNIT_Z;
+    pElement = XMLNode->FirstChildElement("localDirection");
 
-	// Process offset (?)
-	Vector3 offset = Vector3::ZERO;
-	pElement = XMLNode->FirstChildElement("offset");
-	if(pElement)
-		offset = parseVector3(pElement);
+    if (pElement)
+        localDirection = parseVector3(pElement);
 
-	// Setup the track target
-	try
-	{
-		SceneNode *pTrackNode = mSceneMgr->getSceneNode(nodeName);
-		pParent->setAutoTracking(true, pTrackNode, localDirection, offset);
-	}
-	catch(Ogre::Exception &/*e*/)
-	{
-		LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a track target!");
-	}
+    // Process offset (?)
+    Vector3 offset = Vector3::ZERO;
+    pElement = XMLNode->FirstChildElement("offset");
+
+    if (pElement)
+        offset = parseVector3(pElement);
+
+    // Setup the track target
+    try
+    {
+        SceneNode *pTrackNode = mSceneMgr->getSceneNode(nodeName);
+        pParent->setAutoTracking(true, pTrackNode, localDirection, offset);
+    }
+    catch (Ogre::Exception &/*e*/)
+    {
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a track target!");
+    }
 }
 
 void DotSceneLoader::processEntity(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	// Process attributes
-	String name = getAttrib(XMLNode, "name");
-	String id = getAttrib(XMLNode, "id");
-	String meshFile = getAttrib(XMLNode, "meshFile");
-	String materialFile = getAttrib(XMLNode, "materialFile");
-	bool isStatic = getAttribBool(XMLNode, "static", false);;
-	bool castShadows = getAttribBool(XMLNode, "castShadows", true);
+    // Process attributes
+    String name = getAttrib(XMLNode, "name");
+    String id = getAttrib(XMLNode, "id");
+    String meshFile = getAttrib(XMLNode, "meshFile");
+    String materialFile = getAttrib(XMLNode, "materialFile");
+    bool isStatic = getAttribBool(XMLNode, "static", false);;
+    bool castShadows = getAttribBool(XMLNode, "castShadows", true);
 
-	// TEMP: Maintain a list of static and dynamic objects
-	if(isStatic)
-		staticObjects.push_back(name);
-	else
-		dynamicObjects.push_back(name);
+    // TEMP: Maintain a list of static and dynamic objects
+    if (isStatic)
+        staticObjects.push_back(name);
+    else
+        dynamicObjects.push_back(name);
 
-	TiXmlElement *pElement;
+    TiXmlElement *pElement;
 
-	// Process vertexBuffer (?)
-	pElement = XMLNode->FirstChildElement("vertexBuffer");
-	if(pElement)
-		;//processVertexBuffer(pElement);
+    // Process vertexBuffer (?)
+    pElement = XMLNode->FirstChildElement("vertexBuffer");
 
-	// Process indexBuffer (?)
-	pElement = XMLNode->FirstChildElement("indexBuffer");
-	if(pElement)
-		;//processIndexBuffer(pElement);
+    if (pElement)
+        ;//processVertexBuffer(pElement);
 
-	// Create the entity
-	Entity *pEntity = 0;
-	try
-	{
-		MeshManager::getSingleton().load(meshFile, m_sGroupName);
-		pEntity = mSceneMgr->createEntity(name, meshFile);
-		pEntity->setCastShadows(castShadows);
-		pParent->attachObject(pEntity);
+    // Process indexBuffer (?)
+    pElement = XMLNode->FirstChildElement("indexBuffer");
 
-		if(!materialFile.empty())
-			pEntity->setMaterialName(materialFile);
-	}
-	catch(Ogre::Exception &/*e*/)
-	{
-		LogManager::getSingleton().logMessage("[DotSceneLoader] Error loading an entity!");
-	}
+    if (pElement)
+        ;//processIndexBuffer(pElement);
 
-	// Process userDataReference (?)
-	pElement = XMLNode->FirstChildElement("userDataReference");
-	if(pElement)
-		processUserDataReference(pElement, pEntity);
+    // Create the entity
+    Entity *pEntity = 0;
+
+    try
+    {
+        MeshManager::getSingleton().load(meshFile, m_sGroupName);
+        pEntity = mSceneMgr->createEntity(name, meshFile);
+        pEntity->setCastShadows(castShadows);
+        pParent->attachObject(pEntity);
+
+        if (!materialFile.empty())
+            pEntity->setMaterialName(materialFile);
+    }
+    catch (Ogre::Exception &/*e*/)
+    {
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error loading an entity!");
+    }
+
+    // Process userDataReference (?)
+    pElement = XMLNode->FirstChildElement("userDataReference");
+
+    if (pElement)
+        processUserDataReference(pElement, pEntity);
 
     pElement = XMLNode->FirstChildElement("physics");
-    if(pElement)
+
+    if (pElement)
         processPhysics(pElement, pEntity, pParent);
 
 }
@@ -639,6 +725,7 @@ void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity, Scen
     btCollisionShape* shape;
     btScalar mass;
     String shapeType = getAttrib(XMLNode, "shape");
+
     if (shapeType == "box")
         shape = converter.createBox();
 
@@ -652,7 +739,9 @@ void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity, Scen
         shape = converter.createTrimesh();
 
     String massString = getAttrib(XMLNode, "mass");
-    if (mass) {
+
+    if (mass)
+    {
         istringstream massStream(massString);
         massStream >> mass;
     }
@@ -666,261 +755,265 @@ void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity, Scen
     BtOgre::RigidBodyState *groundState = new BtOgre::RigidBodyState(pNode);
 
     LogManager::getSingleton().logMessage("[DotSceneLoader] Adding physics RigidBody: " + shapeType + ", mass of " + massString);
-    physicsWorld->addRigidBody(new btRigidBody(mass, groundState, shape, btVector3(0,0,0)));
+    physicsWorld->addRigidBody(new btRigidBody(mass, groundState, shape, btVector3(0, 0, 0)));
 
-	//btRigidBody* body = new btRigidBody(0, groundState, shape, btVector3(0,0,0));
+    //btRigidBody* body = new btRigidBody(0, groundState, shape, btVector3(0,0,0));
     //physicsWorld->addRigidBody(body);
 }
 
 void DotSceneLoader::processParticleSystem(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	// Process attributes
-	String name = getAttrib(XMLNode, "name");
-	String id = getAttrib(XMLNode, "id");
-	String file = getAttrib(XMLNode, "file");
+    // Process attributes
+    String name = getAttrib(XMLNode, "name");
+    String id = getAttrib(XMLNode, "id");
+    String file = getAttrib(XMLNode, "file");
 
-	// Create the particle system
-	try
-	{
-		ParticleSystem *pParticles = mSceneMgr->createParticleSystem(name, file);
-		pParent->attachObject(pParticles);
-	}
-	catch(Ogre::Exception &/*e*/)
-	{
-		LogManager::getSingleton().logMessage("[DotSceneLoader] Error creating a particle system!");
-	}
+    // Create the particle system
+    try
+    {
+        ParticleSystem *pParticles = mSceneMgr->createParticleSystem(name, file);
+        pParent->attachObject(pParticles);
+    }
+    catch (Ogre::Exception &/*e*/)
+    {
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error creating a particle system!");
+    }
 }
 
 void DotSceneLoader::processBillboardSet(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	//! @todo Implement this
+    //! @todo Implement this
 }
 
 void DotSceneLoader::processPlane(TiXmlElement *XMLNode, SceneNode *pParent)
 {
-	//! @todo Implement this
+    //! @todo Implement this
 }
 
 void DotSceneLoader::processFog(TiXmlElement *XMLNode)
 {
-	// Process attributes
-	Real expDensity = getAttribReal(XMLNode, "expDensity", 0.001);
-	Real linearStart = getAttribReal(XMLNode, "linearStart", 0.0);
-	Real linearEnd = getAttribReal(XMLNode, "linearEnd", 1.0);
+    // Process attributes
+    Real expDensity = getAttribReal(XMLNode, "expDensity", 0.001);
+    Real linearStart = getAttribReal(XMLNode, "linearStart", 0.0);
+    Real linearEnd = getAttribReal(XMLNode, "linearEnd", 1.0);
 
-	FogMode mode = FOG_NONE;
-	String sMode = getAttrib(XMLNode, "mode");
-	if(sMode == "none")
-		mode = FOG_NONE;
-	else if(sMode == "exp")
-		mode = FOG_EXP;
-	else if(sMode == "exp2")
-		mode = FOG_EXP2;
-	else if(sMode == "linear")
-		mode = FOG_LINEAR;
+    FogMode mode = FOG_NONE;
+    String sMode = getAttrib(XMLNode, "mode");
 
-	TiXmlElement *pElement;
+    if (sMode == "none")
+        mode = FOG_NONE;
+    else if (sMode == "exp")
+        mode = FOG_EXP;
+    else if (sMode == "exp2")
+        mode = FOG_EXP2;
+    else if (sMode == "linear")
+        mode = FOG_LINEAR;
 
-	// Process colourDiffuse (?)
-	ColourValue colourDiffuse = ColourValue::White;
-	pElement = XMLNode->FirstChildElement("colourDiffuse");
-	if(pElement)
-		colourDiffuse = parseColour(pElement);
+    TiXmlElement *pElement;
 
-	// Setup the fog
-	mSceneMgr->setFog(mode, colourDiffuse, expDensity, linearStart, linearEnd);
+    // Process colourDiffuse (?)
+    ColourValue colourDiffuse = ColourValue::White;
+    pElement = XMLNode->FirstChildElement("colourDiffuse");
+
+    if (pElement)
+        colourDiffuse = parseColour(pElement);
+
+    // Setup the fog
+    mSceneMgr->setFog(mode, colourDiffuse, expDensity, linearStart, linearEnd);
 }
 
 void DotSceneLoader::processSkyBox(TiXmlElement *XMLNode)
 {
-	// Process attributes
-	String material = getAttrib(XMLNode, "material");
-	Real distance = getAttribReal(XMLNode, "distance", 5000);
-	bool drawFirst = getAttribBool(XMLNode, "drawFirst", true);
+    // Process attributes
+    String material = getAttrib(XMLNode, "material");
+    Real distance = getAttribReal(XMLNode, "distance", 5000);
+    bool drawFirst = getAttribBool(XMLNode, "drawFirst", true);
 
-	TiXmlElement *pElement;
+    TiXmlElement *pElement;
 
-	// Process rotation (?)
-	Quaternion rotation = Quaternion::IDENTITY;
-	pElement = XMLNode->FirstChildElement("rotation");
-	if(pElement)
-		rotation = parseQuaternion(pElement);
+    // Process rotation (?)
+    Quaternion rotation = Quaternion::IDENTITY;
+    pElement = XMLNode->FirstChildElement("rotation");
 
-	// Setup the sky box
-	mSceneMgr->setSkyBox(true, material, distance, drawFirst, rotation, m_sGroupName);
+    if (pElement)
+        rotation = parseQuaternion(pElement);
+
+    // Setup the sky box
+    mSceneMgr->setSkyBox(true, material, distance, drawFirst, rotation, m_sGroupName);
 }
 
 void DotSceneLoader::processSkyDome(TiXmlElement *XMLNode)
 {
-	// Process attributes
-	String material = XMLNode->Attribute("material");
-	Real curvature = getAttribReal(XMLNode, "curvature", 10);
-	Real tiling = getAttribReal(XMLNode, "tiling", 8);
-	Real distance = getAttribReal(XMLNode, "distance", 4000);
-	bool drawFirst = getAttribBool(XMLNode, "drawFirst", true);
+    // Process attributes
+    String material = XMLNode->Attribute("material");
+    Real curvature = getAttribReal(XMLNode, "curvature", 10);
+    Real tiling = getAttribReal(XMLNode, "tiling", 8);
+    Real distance = getAttribReal(XMLNode, "distance", 4000);
+    bool drawFirst = getAttribBool(XMLNode, "drawFirst", true);
 
-	TiXmlElement *pElement;
+    TiXmlElement *pElement;
 
-	// Process rotation (?)
-	Quaternion rotation = Quaternion::IDENTITY;
-	pElement = XMLNode->FirstChildElement("rotation");
-	if(pElement)
-		rotation = parseQuaternion(pElement);
+    // Process rotation (?)
+    Quaternion rotation = Quaternion::IDENTITY;
+    pElement = XMLNode->FirstChildElement("rotation");
 
-	// Setup the sky dome
-	mSceneMgr->setSkyDome(true, material, curvature, tiling, distance, drawFirst, rotation, 16, 16, -1, m_sGroupName);
+    if (pElement)
+        rotation = parseQuaternion(pElement);
+
+    // Setup the sky dome
+    mSceneMgr->setSkyDome(true, material, curvature, tiling, distance, drawFirst, rotation, 16, 16, -1, m_sGroupName);
 }
 
 void DotSceneLoader::processSkyPlane(TiXmlElement *XMLNode)
 {
-	// Process attributes
-	String material = getAttrib(XMLNode, "material");
-	Real planeX = getAttribReal(XMLNode, "planeX", 0);
-	Real planeY = getAttribReal(XMLNode, "planeY", -1);
-	Real planeZ = getAttribReal(XMLNode, "planeX", 0);
-	Real planeD = getAttribReal(XMLNode, "planeD", 5000);
-	Real scale = getAttribReal(XMLNode, "scale", 1000);
-	Real bow = getAttribReal(XMLNode, "bow", 0);
-	Real tiling = getAttribReal(XMLNode, "tiling", 10);
-	bool drawFirst = getAttribBool(XMLNode, "drawFirst", true);
+    // Process attributes
+    String material = getAttrib(XMLNode, "material");
+    Real planeX = getAttribReal(XMLNode, "planeX", 0);
+    Real planeY = getAttribReal(XMLNode, "planeY", -1);
+    Real planeZ = getAttribReal(XMLNode, "planeX", 0);
+    Real planeD = getAttribReal(XMLNode, "planeD", 5000);
+    Real scale = getAttribReal(XMLNode, "scale", 1000);
+    Real bow = getAttribReal(XMLNode, "bow", 0);
+    Real tiling = getAttribReal(XMLNode, "tiling", 10);
+    bool drawFirst = getAttribBool(XMLNode, "drawFirst", true);
 
-	// Setup the sky plane
-	Plane plane;
-	plane.normal = Vector3(planeX, planeY, planeZ);
-	plane.d = planeD;
-	mSceneMgr->setSkyPlane(true, plane, material, scale, tiling, drawFirst, bow, 1, 1, m_sGroupName);
+    // Setup the sky plane
+    Plane plane;
+    plane.normal = Vector3(planeX, planeY, planeZ);
+    plane.d = planeD;
+    mSceneMgr->setSkyPlane(true, plane, material, scale, tiling, drawFirst, bow, 1, 1, m_sGroupName);
 }
 
 void DotSceneLoader::processClipping(TiXmlElement *XMLNode)
 {
-	//! @todo Implement this
+    //! @todo Implement this
 
-	// Process attributes
-	Real fNear = getAttribReal(XMLNode, "near", 0);
-	Real fFar = getAttribReal(XMLNode, "far", 1);
+    // Process attributes
+    Real fNear = getAttribReal(XMLNode, "near", 0);
+    Real fFar = getAttribReal(XMLNode, "far", 1);
 }
 
 void DotSceneLoader::processLightRange(TiXmlElement *XMLNode, Light *pLight)
 {
-	// Process attributes
-	Real inner = getAttribReal(XMLNode, "inner");
-	Real outer = getAttribReal(XMLNode, "outer");
-	Real falloff = getAttribReal(XMLNode, "falloff", 1.0);
+    // Process attributes
+    Real inner = getAttribReal(XMLNode, "inner");
+    Real outer = getAttribReal(XMLNode, "outer");
+    Real falloff = getAttribReal(XMLNode, "falloff", 1.0);
 
-	// Setup the light range
-	pLight->setSpotlightRange(Angle(inner), Angle(outer), falloff);
+    // Setup the light range
+    pLight->setSpotlightRange(Angle(inner), Angle(outer), falloff);
 }
 
 void DotSceneLoader::processLightAttenuation(TiXmlElement *XMLNode, Light *pLight)
 {
-	// Process attributes
-	Real range = getAttribReal(XMLNode, "range");
-	Real constant = getAttribReal(XMLNode, "constant");
-	Real linear = getAttribReal(XMLNode, "linear");
-	Real quadratic = getAttribReal(XMLNode, "quadratic");
+    // Process attributes
+    Real range = getAttribReal(XMLNode, "range");
+    Real constant = getAttribReal(XMLNode, "constant");
+    Real linear = getAttribReal(XMLNode, "linear");
+    Real quadratic = getAttribReal(XMLNode, "quadratic");
 
-	// Setup the light attenuation
-	pLight->setAttenuation(range, constant, linear, quadratic);
+    // Setup the light attenuation
+    pLight->setAttenuation(range, constant, linear, quadratic);
 }
 
 
 String DotSceneLoader::getAttrib(TiXmlElement *XMLNode, const String &attrib, const String &defaultValue)
 {
-	if(XMLNode->Attribute(attrib.c_str()))
-		return XMLNode->Attribute(attrib.c_str());
-	else
-		return defaultValue;
+    if (XMLNode->Attribute(attrib.c_str()))
+        return XMLNode->Attribute(attrib.c_str());
+    else
+        return defaultValue;
 }
 
 Real DotSceneLoader::getAttribReal(TiXmlElement *XMLNode, const String &attrib, Real defaultValue)
 {
-	if(XMLNode->Attribute(attrib.c_str()))
-		return StringConverter::parseReal(XMLNode->Attribute(attrib.c_str()));
-	else
-		return defaultValue;
+    if (XMLNode->Attribute(attrib.c_str()))
+        return StringConverter::parseReal(XMLNode->Attribute(attrib.c_str()));
+    else
+        return defaultValue;
 }
 
 bool DotSceneLoader::getAttribBool(TiXmlElement *XMLNode, const String &attrib, bool defaultValue)
 {
-	if(!XMLNode->Attribute(attrib.c_str()))
-		return defaultValue;
+    if (!XMLNode->Attribute(attrib.c_str()))
+        return defaultValue;
 
-	if(String(XMLNode->Attribute(attrib.c_str())) == "true")
-		return true;
+    if (String(XMLNode->Attribute(attrib.c_str())) == "true")
+        return true;
 
-	return false;
+    return false;
 }
 
 
 Vector3 DotSceneLoader::parseVector3(TiXmlElement *XMLNode)
 {
-	return Vector3(
-		StringConverter::parseReal(XMLNode->Attribute("x")),
-		StringConverter::parseReal(XMLNode->Attribute("y")),
-		StringConverter::parseReal(XMLNode->Attribute("z"))
-	);
+    return Vector3(
+               StringConverter::parseReal(XMLNode->Attribute("x")),
+               StringConverter::parseReal(XMLNode->Attribute("y")),
+               StringConverter::parseReal(XMLNode->Attribute("z"))
+           );
 }
 
 Quaternion DotSceneLoader::parseQuaternion(TiXmlElement *XMLNode)
 {
-	//! @todo Fix this crap!
+    //! @todo Fix this crap!
 
-	Quaternion orientation;
+    Quaternion orientation;
 
-	if(XMLNode->Attribute("qx"))
-	{
-		orientation.x = StringConverter::parseReal(XMLNode->Attribute("qx"));
-		orientation.y = StringConverter::parseReal(XMLNode->Attribute("qy"));
-		orientation.z = StringConverter::parseReal(XMLNode->Attribute("qz"));
-		orientation.w = StringConverter::parseReal(XMLNode->Attribute("qw"));
-	}
-	else if(XMLNode->Attribute("axisX"))
-	{
-		Vector3 axis;
-		axis.x = StringConverter::parseReal(XMLNode->Attribute("axisX"));
-		axis.y = StringConverter::parseReal(XMLNode->Attribute("axisY"));
-		axis.z = StringConverter::parseReal(XMLNode->Attribute("axisZ"));
-		Real angle = StringConverter::parseReal(XMLNode->Attribute("angle"));;
-		orientation.FromAngleAxis(Ogre::Angle(angle), axis);
-	}
-	else if(XMLNode->Attribute("angleX"))
-	{
-		Vector3 axis;
-		axis.x = StringConverter::parseReal(XMLNode->Attribute("angleX"));
-		axis.y = StringConverter::parseReal(XMLNode->Attribute("angleY"));
-		axis.z = StringConverter::parseReal(XMLNode->Attribute("angleZ"));
-		//orientation.FromAxes(&axis);
-		//orientation.F
-	}
+    if (XMLNode->Attribute("qx"))
+    {
+        orientation.x = StringConverter::parseReal(XMLNode->Attribute("qx"));
+        orientation.y = StringConverter::parseReal(XMLNode->Attribute("qy"));
+        orientation.z = StringConverter::parseReal(XMLNode->Attribute("qz"));
+        orientation.w = StringConverter::parseReal(XMLNode->Attribute("qw"));
+    }
+    else if (XMLNode->Attribute("axisX"))
+    {
+        Vector3 axis;
+        axis.x = StringConverter::parseReal(XMLNode->Attribute("axisX"));
+        axis.y = StringConverter::parseReal(XMLNode->Attribute("axisY"));
+        axis.z = StringConverter::parseReal(XMLNode->Attribute("axisZ"));
+        Real angle = StringConverter::parseReal(XMLNode->Attribute("angle"));;
+        orientation.FromAngleAxis(Ogre::Angle(angle), axis);
+    }
+    else if (XMLNode->Attribute("angleX"))
+    {
+        Vector3 axis;
+        axis.x = StringConverter::parseReal(XMLNode->Attribute("angleX"));
+        axis.y = StringConverter::parseReal(XMLNode->Attribute("angleY"));
+        axis.z = StringConverter::parseReal(XMLNode->Attribute("angleZ"));
+        //orientation.FromAxes(&axis);
+        //orientation.F
+    }
 
-	return orientation;
+    return orientation;
 }
 
 ColourValue DotSceneLoader::parseColour(TiXmlElement *XMLNode)
 {
-	return ColourValue(
-		StringConverter::parseReal(XMLNode->Attribute("r")),
-		StringConverter::parseReal(XMLNode->Attribute("g")),
-		StringConverter::parseReal(XMLNode->Attribute("b")),
-		XMLNode->Attribute("a") != NULL ? StringConverter::parseReal(XMLNode->Attribute("a")) : 1
-	);
+    return ColourValue(
+               StringConverter::parseReal(XMLNode->Attribute("r")),
+               StringConverter::parseReal(XMLNode->Attribute("g")),
+               StringConverter::parseReal(XMLNode->Attribute("b")),
+               XMLNode->Attribute("a") != NULL ? StringConverter::parseReal(XMLNode->Attribute("a")) : 1
+           );
 }
 
 String DotSceneLoader::getProperty(const String &ndNm, const String &prop)
 {
-	for ( unsigned int i = 0 ; i < nodeProperties.size(); i++ )
-	{
-		if ( nodeProperties[i].nodeName == ndNm && nodeProperties[i].propertyNm == prop )
-		{
-			return nodeProperties[i].valueName;
-		}
-	}
+    for (unsigned int i = 0 ; i < nodeProperties.size(); i++)
+    {
+        if (nodeProperties[i].nodeName == ndNm && nodeProperties[i].propertyNm == prop)
+        {
+            return nodeProperties[i].valueName;
+        }
+    }
 
-	return "";
+    return "";
 }
 
 void DotSceneLoader::processUserDataReference(TiXmlElement *XMLNode, Entity *pEntity)
 {
-	String str = XMLNode->Attribute("id");
-	pEntity->setUserAny(Any(str));
+    String str = XMLNode->Attribute("id");
+    pEntity->setUserAny(Any(str));
 }

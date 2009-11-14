@@ -1,24 +1,51 @@
-/*
- * =====================================================================================
+/* Copyright 2009 Austin Brown
  *
- *       Filename:  BtOgreGP.h
+ * This file is part of Flow.
  *
- *    Description:  The part of BtOgre that handles information transfer from Ogre to 
- *                  Bullet (like mesh data for making trimeshes).
+ * Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *        Version:  1.0
- *        Created:  27/12/2008 03:29:56 AM
+ * Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *         Author:  Nikhilesh (nikki)
+ * You should have received a copy of the GNU General Public License
+ * along with Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
- * =====================================================================================
+ *
+ *
+ * Author: Nikhilesh (nikki)
+ *
+ * The BtOgre license is based on the Bullet (zlib) license, which is as follows:-
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ *     1. The origin of this software must not be misrepresented; you must not
+ *     claim that you wrote the original software. If you use this software
+ *     in a product, an acknowledgment in the product documentation would be
+ *     appreciated but is not required.
+ *
+ *     2. Altered source versions must be plainly marked as such, and must not be
+ *     misrepresented as being the original software.
+ *
+ *     3. This notice may not be removed or altered from any source
+ *     distribution.
  */
 
 #ifndef _BtOgrePG_H_
 #define _BtOgrePG_H_
 
 #include "btBulletDynamicsCommon.h"
-#include "BtOgreExtras.h"
+#include "BtOgreExtras.hpp"
 #include "Ogre.h"
 
 namespace BtOgre {
@@ -51,8 +78,8 @@ protected:
 
 	void addStaticVertexData(const Ogre::VertexData *vertex_data);
 
-	void addAnimatedVertexData(const Ogre::VertexData *vertex_data, 
-		const Ogre::VertexData *blended_data, 
+	void addAnimatedVertexData(const Ogre::VertexData *vertex_data,
+		const Ogre::VertexData *blended_data,
 		const Ogre::Mesh::IndexMap *indexMap);
 
 	void addIndexData(Ogre::IndexData *data, const unsigned int offset = 0);
@@ -84,7 +111,7 @@ public:
 	~StaticMeshToShapeConverter();
 
 	void addEntity(Ogre::Entity *entity,const Ogre::Matrix4 &transform = Ogre::Matrix4::IDENTITY);
-	
+
 	void addMesh(const Ogre::MeshPtr &mesh, const Ogre::Matrix4 &transform = Ogre::Matrix4::IDENTITY);
 
 
@@ -106,29 +133,29 @@ public:
 	void addEntity(Ogre::Entity *entity,const Ogre::Matrix4 &transform = Ogre::Matrix4::IDENTITY);
 	void addMesh(const Ogre::MeshPtr &mesh, const Ogre::Matrix4 &transform);
 
-	btBoxShape* createAlignedBox(unsigned char bone, 
+	btBoxShape* createAlignedBox(unsigned char bone,
 		const Ogre::Vector3 &bonePosition,
 		const Ogre::Quaternion &boneOrientation);
 
-	btBoxShape* createOrientedBox(unsigned char bone, 
+	btBoxShape* createOrientedBox(unsigned char bone,
 		const Ogre::Vector3 &bonePosition,
 		const Ogre::Quaternion &boneOrientation);
 
 protected:
 
-	bool getBoneVertices(unsigned char bone, 
-		unsigned int &vertex_count, 
+	bool getBoneVertices(unsigned char bone,
+		unsigned int &vertex_count,
 		Ogre::Vector3* &vertices,
 		const Ogre::Vector3 &bonePosition);
 
-	bool getOrientedBox(unsigned char bone, 
+	bool getOrientedBox(unsigned char bone,
 		const Ogre::Vector3 &bonePosition,
 		const Ogre::Quaternion &boneOrientation,
 		Ogre::Vector3 &extents,
 		Ogre::Vector3 *axis,
 		Ogre::Vector3 &center);
 
-	
+
 	Ogre::Entity*		mEntity;
 	Ogre::SceneNode*	mNode;
 

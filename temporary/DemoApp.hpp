@@ -15,15 +15,15 @@
 
 class DemoApp
 {
-public:
-	DemoApp();
-	~DemoApp();
+    public:
+        DemoApp();
+        ~DemoApp();
 
-	void startDemo();
+        void startDemo();
 
-private:
-	AppStateManager*	m_pAppStateManager;
-	bool			m_bShutdown;
+    private:
+        AppStateManager*    m_pAppStateManager;
+        bool            m_bShutdown;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

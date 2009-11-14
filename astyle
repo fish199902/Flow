@@ -1,0 +1,13 @@
+--indent=spaces
+--brackets=break
+--indent-classes
+--indent-switches
+--indent-cases
+--indent-namespaces
+--indent-preprocessor
+--break-blocks
+--pad-oper
+--convert-tabs
+--unpad-paren
+--mode=c
+--suffix=none

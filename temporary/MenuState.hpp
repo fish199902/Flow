@@ -11,29 +11,29 @@
 
 class MenuState : public AppState
 {
-public:
-	DECLARE_APPSTATE_CLASS(MenuState)
+    public:
+        DECLARE_APPSTATE_CLASS(MenuState)
 
-	void enter();
-	void createScene();
-	void exit();
-	bool pause();
-	void resume();
+        void enter();
+        void createScene();
+        void exit();
+        bool pause();
+        void resume();
 
-	bool keyPressed(const OIS::KeyEvent &keyEventRef);
-	bool keyReleased(const OIS::KeyEvent &keyEventRef);
+        bool keyPressed(const OIS::KeyEvent &keyEventRef);
+        bool keyReleased(const OIS::KeyEvent &keyEventRef);
 
-	bool mouseMoved(const OIS::MouseEvent &evt);
-	bool mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
-	bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
+        bool mouseMoved(const OIS::MouseEvent &evt);
+        bool mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
+        bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
 
-	bool onExitButton(const CEGUI::EventArgs &args);
-	bool onEnterButton(const CEGUI::EventArgs &args);
+        bool onExitButton(const CEGUI::EventArgs &args);
+        bool onEnterButton(const CEGUI::EventArgs &args);
 
-	void update(double timeSinceLastFrame);
+        void update(double timeSinceLastFrame);
 
-private:
-	bool		m_bQuit;
+    private:
+        bool        m_bQuit;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
