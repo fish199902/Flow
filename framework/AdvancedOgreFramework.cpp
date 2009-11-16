@@ -142,6 +142,11 @@ void OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     m_pRenderWnd->setActive(true);
 }
 
+bool OgreFramework::getDebugState()
+{
+    return m_pDebugOverlay->isVisible();
+}
+
 /**
  * Handle global keypresses, including activating/deactivating the debug overlay
  * and taking screenshots.

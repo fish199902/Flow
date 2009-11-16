@@ -55,6 +55,8 @@ class OgreFramework : public Ogre::Singleton<OgreFramework>, OIS::KeyListener, O
         void updateOgre(double timeSinceLastFrame);
         void updateStats();
 
+        bool getDebugState();
+
         bool keyPressed(const OIS::KeyEvent &keyEventRef);
         bool keyReleased(const OIS::KeyEvent &keyEventRef);
 

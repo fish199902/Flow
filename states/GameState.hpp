@@ -34,6 +34,11 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+#define IMPULSE_VALUE 10
+#define GRAVITY_ACCELERATION 0, -9.81, 0
+
+//|||||||||||||||||||||||||||||||||||||||||||||||
+
 enum QueryFlags
 {
     OGRE_HEAD_MASK  = 1 << 0,
@@ -59,6 +64,7 @@ class GameState : public AppState
 
         void moveCamera();
         void getInput();
+        void movePlayer();
 
         bool keyPressed(const OIS::KeyEvent &keyEventRef);
         bool keyReleased(const OIS::KeyEvent &keyEventRef);
@@ -101,6 +107,10 @@ class GameState : public AppState
         btAxisSweep3*                           broadphase;
 
         BtOgre::DebugDrawer*                    physicsDebug;
+
+        btRigidBody*                            m_pPlayerPhysics;
+        btVector3                               m_ImpulseVector;
+        btScalar                                m_Impulse;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

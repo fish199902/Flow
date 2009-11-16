@@ -755,10 +755,18 @@ void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity, Scen
     BtOgre::RigidBodyState *groundState = new BtOgre::RigidBodyState(pNode);
 
     LogManager::getSingleton().logMessage("[DotSceneLoader] Adding physics RigidBody: " + shapeType + ", mass of " + massString);
-    physicsWorld->addRigidBody(new btRigidBody(mass, groundState, shape, btVector3(0, 0, 0)));
 
-    //btRigidBody* body = new btRigidBody(0, groundState, shape, btVector3(0,0,0));
-    //physicsWorld->addRigidBody(body);
+    btRigidBody* body = new btRigidBody(mass, groundState, shape, btVector3(0, 0, 0));
+    physicsWorld->addRigidBody(body);
+
+    /// \todo This might need to add other nodes than just the player (To allow manipulating other objects).
+    if (pNode->getName() == "player")
+    {
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Added player node.");
+        playerRigidBody = body;
+
+        body->setActivationState(DISABLE_DEACTIVATION);
+    }
 }
 
 void DotSceneLoader::processParticleSystem(TiXmlElement *XMLNode, SceneNode *pParent)

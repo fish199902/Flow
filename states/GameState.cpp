@@ -105,12 +105,12 @@ void GameState::enter()
     physicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
     // Set Y axis to 'up', this should match ogre.
-    physicsWorld->setGravity(btVector3(0, -10, 0));
+    physicsWorld->setGravity(btVector3(GRAVITY_ACCELERATION));
 
     // btOgre Stuff
     physicsDebug = new BtOgre::DebugDrawer(m_pSceneMgr->getRootSceneNode(), physicsWorld);
     physicsWorld->setDebugDrawer(physicsDebug);
-    physicsDebug->setDebugMode(false);
+    physicsDebug->setDebugMode(OgreFramework::getSingletonPtr()->getDebugState());
 
     createScene();
 }
@@ -177,6 +177,12 @@ void GameState::createScene()
 
     Ogre::DotSceneLoader* pDotSceneLoader = new Ogre::DotSceneLoader();
     pDotSceneLoader->parseDotScene(m_LevelName + ".xml", "General", m_pSceneMgr, physicsWorld, m_pSceneMgr->getRootSceneNode());
+
+    m_pPlayerPhysics = pDotSceneLoader->playerRigidBody;
+    if (!m_pPlayerPhysics)
+    {
+        OgreFramework::getSingletonPtr()->m_pLog->logMessage("Error, no player found in level");
+    }
 }
 
 bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
@@ -319,6 +325,34 @@ void GameState::getInput()
     {
         m_pCamera->pitch(-m_RotScale);
     }
+
+
+    // Player motion
+
+    if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_LEFT))
+    {
+        m_ImpulseVector.setX(m_ImpulseVector.getX() - m_Impulse);
+    }
+
+    if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_RIGHT))
+    {
+        m_ImpulseVector.setX(m_ImpulseVector.getX() + m_Impulse);
+    }
+
+    if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_UP))
+    {
+        m_ImpulseVector.setZ(m_ImpulseVector.getZ() - m_Impulse);
+    }
+
+    if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_DOWN))
+    {
+        m_ImpulseVector.setZ(m_ImpulseVector.getZ() + m_Impulse);
+    }
+}
+
+void GameState::movePlayer()
+{
+    m_pPlayerPhysics->applyCentralImpulse(m_ImpulseVector);
 }
 
 void GameState::update(double timeSinceLastFrame)
@@ -331,8 +365,10 @@ void GameState::update(double timeSinceLastFrame)
 
     m_MoveScale = m_MoveSpeed   * timeSinceLastFrame;
     m_RotScale  = m_RotateSpeed * timeSinceLastFrame;
+    m_Impulse   = 10 * timeSinceLastFrame;
 
     m_TranslateVector = Vector3::ZERO;
+    m_ImpulseVector.setValue(0, 0, 0);
 
     // Update Bullet
     physicsWorld->stepSimulation(timeSinceLastFrame, 10);
@@ -340,6 +376,7 @@ void GameState::update(double timeSinceLastFrame)
 
     getInput();
     moveCamera();
+    movePlayer();
 
     physicsDebug->step();
 }
@@ -374,7 +411,11 @@ void GameState::setUnbufferedMode()
     pModeCaption->setText("Unuffered Input Mode");
 
     CEGUI::MultiLineEditbox* pControlsPanel = (CEGUI::MultiLineEditbox*)m_pMainWnd->getChild("ControlsPanel");
-    pControlsPanel->setText("Look Controls:\n"
+    pControlsPanel->setText("Player Motion:\n"
+                            "Up / Down - Z Motion\n"
+                            "Left / Right - X Motion\n"
+                            "\n"
+                            "Look Controls:\n"
                             "[NUM1] - Left\n"
                             "[NUM2] - Down\n"
                             "[NUM3] - Right\n"

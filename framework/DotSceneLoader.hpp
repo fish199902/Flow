@@ -60,9 +60,11 @@ namespace Ogre
             void parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, btDiscreteDynamicsWorld *physWorld, SceneNode *pAttachNode = NULL, const String &sPrependNode = "");
             String getProperty(const String &ndNm, const String &prop);
 
-            std::vector<nodeProperty> nodeProperties;
-            std::vector<String> staticObjects;
-            std::vector<String> dynamicObjects;
+            std::vector<nodeProperty>   nodeProperties;
+            std::vector<String>         staticObjects;
+            std::vector<String>         dynamicObjects;
+
+            btRigidBody                 *playerRigidBody;
 
         protected:
             void processScene(TiXmlElement *XMLRoot);
@@ -109,7 +111,7 @@ namespace Ogre
             String m_sGroupName;
             String m_sPrependNode;
 
-            btDiscreteDynamicsWorld *physicsWorld;
+            btDiscreteDynamicsWorld     *physicsWorld;
     };
 }
 
