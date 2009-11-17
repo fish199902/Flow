@@ -1,0 +1,85 @@
+<scene formatVersion="1.0.0">
+  <nodes>
+    <node name="tank">
+      <position x="11.000000" y="-5.000000" z="-7.000000"/>
+      <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="1.200000" y="0.720000" z="1.200000"/>
+      <entity name="tank" meshFile="tank.mesh">
+        <physics shape="trimesh" mass="0"/>
+      </entity>
+    </node>
+    <node name="title">
+      <position x="3.602250" y="2.250624" z="-15.000000"/>
+      <quaternion x="0.000000" y="-0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="0.800000" y="0.800000" z="0.800000"/>
+      <entity name="title" meshFile="title.mesh">
+        <physics shape="trimesh" mass="0"/>
+      </entity>
+    </node>
+    <node name="track">
+      <position x="0.000000" y="0.000000" z="-0.000000"/>
+      <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <entity name="track" meshFile="track.mesh">
+        <physics shape="trimesh" mass="0"/>
+      </entity>
+    </node>
+    <node name="messages">
+      <position x="3.500000" y="1.200000" z="-16.000000"/>
+      <quaternion x="0.000000" y="-0.000000" z="0.000000" w="1.000000"/>
+      <scale x="0.319849" y="0.319849" z="0.319849"/>
+      <entity name="messages" meshFile="mesages.mesh"/>
+    </node>
+    <node name="player">
+      <position x="-1.000000" y="1.500000" z="11.500000"/>
+      <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="0.485423" y="0.485423" z="0.485423"/>
+      <entity name="player" meshFile="player.mesh">
+        <physics shape="sphere" mass="100"/>
+      </entity>
+    </node>
+    <node name="Lamp">
+      <position x="7.424817" y="7.000000" z="-13.924138"/>
+      <quaternion x="-0.707107" y="0.000000" z="0.000000" w="0.707107"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <light name="Lamp" type="directional">
+        <normal x="0.0" y="0.0" z="-1.0"/>
+        <colourDiffuse r="1.000000" g="1.000000" b="1.000000"/>
+        <colourSpecular r="1.000000" g="1.000000" b="1.000000"/>
+      </light>
+    </node>
+    <!--<node name="Camera">
+      <position x="4.738780" y="8.088769" z="22.100437"/>
+      <quaternion x="-0.172987" y="0.085832" z="0.015134" w="0.981060"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <camera name="Camera.001" fov="37.849289" projectionType="perspective">
+        <clipping nearPlaneDist="0.100000" farPlaneDist="100.000000"/>
+      </camera>
+    </node>-->
+    <node name="pipeCurve">
+      <position x="-1.000000" y="-4.000000" z="14.000000"/>
+      <quaternion x="-0.000000" y="-0.000000" z="-0.000000" w="1.000000"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <entity name="pipeCurve" meshFile="pipe.mesh"/>
+    </node>
+    <node name="Lamp.001">
+      <position x="-1.571249" y="17.214319" z="7.132142"/>
+      <quaternion x="-0.707107" y="0.000000" z="0.000000" w="0.707107"/>
+      <scale x="1.000000" y="1.000000" z="1.000000"/>
+      <light name="Lamp.001" type="directional">
+        <normal x="0.0" y="0.0" z="-1.0"/>
+        <colourDiffuse r="1.000000" g="1.000000" b="1.000000"/>
+        <colourSpecular r="1.000000" g="1.000000" b="1.000000"/>
+      </light>
+    </node>
+  </nodes>
+  <externals>
+    <item type="material">
+      <file name="Scene.material"/>
+    </item>
+  </externals>
+  <environment>
+    <colourAmbient r="0.000000" g="0.000000" b="0.000000"/>
+    <colourBackground r="0.056563" g="0.220815" b="0.400000"/>
+  </environment>
+</scene>

@@ -183,6 +183,8 @@ void GameState::createScene()
     {
         OgreFramework::getSingletonPtr()->m_pLog->logMessage("Error, no player found in level");
     }
+    else
+        OgreFramework::getSingletonPtr()->m_pLog->logMessage("Finished loading level");
 }
 
 bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
@@ -370,8 +372,8 @@ void GameState::update(double timeSinceLastFrame)
     m_TranslateVector = Vector3::ZERO;
     m_ImpulseVector.setValue(0, 0, 0);
 
-    // Update Bullet
-    physicsWorld->stepSimulation(timeSinceLastFrame, 10);
+    // Update Bullet, slowed down!
+    physicsWorld->stepSimulation(timeSinceLastFrame, 100);
     physicsWorld->debugDrawWorld();
 
     getInput();
