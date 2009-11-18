@@ -34,7 +34,7 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#define IMPULSE_VALUE 20
+#define IMPULSE_VALUE 250
 #define GRAVITY_ACCELERATION 0, -9.81, 0
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

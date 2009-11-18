@@ -373,7 +373,7 @@ void GameState::update(double timeSinceLastFrame)
     m_ImpulseVector.setValue(0, 0, 0);
 
     // Update Bullet, slowed down!
-    physicsWorld->stepSimulation(timeSinceLastFrame, 100);
+    physicsWorld->stepSimulation(timeSinceLastFrame, 1);
     physicsWorld->debugDrawWorld();
 
     getInput();
