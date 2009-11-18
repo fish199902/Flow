@@ -34,7 +34,7 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#define IMPULSE_VALUE 250
+#define IMPULSE_VALUE 10
 #define GRAVITY_ACCELERATION 0, -9.81, 0
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -86,10 +86,12 @@ class GameState : public AppState
 
         Ogre::String                m_LevelName;
 
-        Ogre::Vector3               m_TranslateVector;
+        Ogre::Vector3               m_ImpulseVector;   // Player motion relative to camera
+        Ogre::Vector3               m_TranslateVector; // Camera motion relative to istelf
         Ogre::Real                  m_MoveSpeed;
         Ogre::Degree                m_RotateSpeed;
-        float                       m_MoveScale;
+        float                       m_MoveScale;       // Per frame motion of camera
+        float                       m_ImpulseScale;
         Ogre::Degree                m_RotScale;
 
         Ogre::RaySceneQuery*        m_pRSQ;
@@ -109,8 +111,6 @@ class GameState : public AppState
         BtOgre::DebugDrawer*                    physicsDebug;
 
         btRigidBody*                            m_pPlayerPhysics;
-        btVector3                               m_ImpulseVector;
-        btScalar                                m_Impulse;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

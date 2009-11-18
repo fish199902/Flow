@@ -183,8 +183,11 @@ void GameState::createScene()
     {
         OgreFramework::getSingletonPtr()->m_pLog->logMessage("Error, no player found in level");
     }
-    else
+    else {
+        m_pCamera->setAutoTracking(true, m_pSceneMgr->getSceneNode("player"));
+
         OgreFramework::getSingletonPtr()->m_pLog->logMessage("Finished loading level");
+    }
 }
 
 bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
@@ -260,6 +263,9 @@ bool GameState::onExitButtonGame(const CEGUI::EventArgs &args)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+/**
+ * Move the camera (if necessary). Called each frame, after m_TranslateVector has beed updated.
+ */
 void GameState::moveCamera()
 {
     if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_LSHIFT))
@@ -269,7 +275,7 @@ void GameState::moveCamera()
 }
 
 /**
- * Handles key mappings. WASD for motion, Arrows for camera, E/C for move up and down.
+ * Gets keypresses. Called while updating each frame
  */
 void GameState::getInput()
 {
@@ -333,30 +339,40 @@ void GameState::getInput()
 
     if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_LEFT))
     {
-        m_ImpulseVector.setX(m_ImpulseVector.getX() - m_Impulse);
+        m_ImpulseVector.x = -m_ImpulseScale;
     }
 
     if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_RIGHT))
     {
-        m_ImpulseVector.setX(m_ImpulseVector.getX() + m_Impulse);
+        m_ImpulseVector.x = m_ImpulseScale;
     }
 
     if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_UP))
     {
-        m_ImpulseVector.setZ(m_ImpulseVector.getZ() - m_Impulse);
+        m_ImpulseVector.z = -m_ImpulseScale;
     }
 
     if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_DOWN))
     {
-        m_ImpulseVector.setZ(m_ImpulseVector.getZ() + m_Impulse);
+        m_ImpulseVector.z = m_ImpulseScale;
     }
 }
 
+/**
+ * Move the player, called each frame from update
+ */
 void GameState::movePlayer()
 {
-    m_pPlayerPhysics->applyCentralImpulse(m_ImpulseVector);
+    /// \todo Make the player motion relative to the camera.
+    //m_ImpulseVector = m_ImpulseVector * m_pCamera->getWorldPosition();
+
+    // Convert m_ImpulseVector to a btVector3 and pass it to bullet
+    m_pPlayerPhysics->applyCentralImpulse(btVector3(m_ImpulseVector.x, m_ImpulseVector.y, m_ImpulseVector.z));
 }
 
+/**
+ * Called each frame to update the scene.
+ */
 void GameState::update(double timeSinceLastFrame)
 {
     if (m_bQuit == true)
@@ -365,15 +381,18 @@ void GameState::update(double timeSinceLastFrame)
         return;
     }
 
-    m_MoveScale = m_MoveSpeed   * timeSinceLastFrame;
-    m_RotScale  = m_RotateSpeed * timeSinceLastFrame;
-    m_Impulse   = 10 * timeSinceLastFrame;
+    // Keep all motion in real time
+    m_MoveScale    = m_MoveSpeed   * timeSinceLastFrame;
+    m_RotScale     = m_RotateSpeed * timeSinceLastFrame;
+    /// \bug Total impulse will be greater if moving in both directions. Use less (sqrt10?) per side.
+    m_ImpulseScale = IMPULSE_VALUE * timeSinceLastFrame;
 
+    // Clear the last update()'s motion
     m_TranslateVector = Vector3::ZERO;
-    m_ImpulseVector.setValue(0, 0, 0);
+    m_ImpulseVector   = Vector3::ZERO;
 
-    // Update Bullet, slowed down!
-    physicsWorld->stepSimulation(timeSinceLastFrame, 1);
+    // Update Bullet
+    physicsWorld->stepSimulation(timeSinceLastFrame, 2, 0.5/timeSinceLastFrame);
     physicsWorld->debugDrawWorld();
 
     getInput();
@@ -410,31 +429,30 @@ void GameState::setBufferedMode()
 void GameState::setUnbufferedMode()
 {
     CEGUI::Editbox* pModeCaption = (CEGUI::Editbox*)m_pMainWnd->getChild("ModeCaption");
-    pModeCaption->setText("Unuffered Input Mode");
+    pModeCaption->setText("Welcome to Flow");
 
     CEGUI::MultiLineEditbox* pControlsPanel = (CEGUI::MultiLineEditbox*)m_pMainWnd->getChild("ControlsPanel");
     pControlsPanel->setText("Player Motion:\n"
                             "Up / Down - Z Motion\n"
                             "Left / Right - X Motion\n"
                             "\n"
-                            "Look Controls:\n"
-                            "[NUM1] - Left\n"
-                            "[NUM2] - Down\n"
-                            "[NUM3] - Right\n"
-                            "[NUM5] - Up\n"
-                            "\n"
+/*                            "Look Controls:\n"
+ *                            "[NUM1] - Left\n"
+ *                            "[NUM2] - Down\n"
+ *                            "[NUM3] - Right\n"
+ *                            "[NUM5] - Up\n"
+ *                            "\n"
+ */
                             "Move Camera:\n"
-                            "[W] - Forward\n"
-                            "[S] - Backwards\n"
+                            "[W] - In\n"
+                            "[S] - Out\n"
                             "[A] - Left\n"
                             "[D] - Right\n"
-                            "[E] - Move Up\n"
-                            "[C] - Move Down\n"
+                            "[E] - Up\n"
+                            "[C] - Down\n"
+                            "[Shift] Move Faster\n"
                             "\n"
-                            "Press [Shift] to move camera faster\n"
-                            "\n"
-                            "[R-CTRL]+[F12] - Toggle Debug"
-                            "\n"
+                            "[R-CTRL]+[F12] - Toggle Debug\n"
                             "[Print] - Take screenshot\n"
                             "\n"
                             "[Esc] - Quit to main menu");
