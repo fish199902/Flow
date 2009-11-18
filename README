@@ -1,3 +1,15 @@
-Flow is a liquid based video game using Ogre and Bullet.
+Flow is a liquid based video game using Ogre and Bullet. It will make use of Bullet SoftBody support in place of fluid simulation to allow realtime play.
 
-TODO
+INCLUDED:
+-BtOgre (http://github.com/nikki93/btogre)
+-Advanced Ogre Framework (http://www.ogre3d.org/wiki/index.php/Advanced_Ogre_Framework)
+-TinyXML (http://www.grinninglizard.com/tinyxml/)
+-New DotScene Loader (http://www.ogre3d.org/wiki/index.php/New_DotScene_Loader)
+
+PREREQUISITES:
+-Bullet 2.74 (Other versions may work)
+-Ogre 1.6.3 (Others versions may work)
+-Code::Blocks
+
+BUILDING:
+At the time of writing, the Code:Blocks project is not very portable: Before you build, you will need to update the include paths to match your system. After you have done this, Flow should build. Flow was written on Linux and Windows, but should work on other platforms where Ogre3D and Bullet are available.
