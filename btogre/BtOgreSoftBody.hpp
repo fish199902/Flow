@@ -49,7 +49,7 @@
 #include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
 #include "BulletSoftBody/btSoftBodyHelpers.h"
 
-#include "Uncopyable.h"
+//#include "Uncopyable.h"
 
 #include <vector>
 #include <map>
@@ -72,7 +72,7 @@ namespace BtOgre
 
 	};
 
-	class BtOgreSoftBody : private Uncopyable {
+	class BtOgreSoftBody /*: private Uncopyable*/ { // Uncopyable.h was nowhere to be found on the internet...
 
 	protected:
 		btSoftBodyWorldInfo* mWorldInfo;

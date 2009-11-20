@@ -64,8 +64,6 @@ namespace Ogre
             std::vector<String>         staticObjects;
             std::vector<String>         dynamicObjects;
 
-            btRigidBody                 *playerRigidBody;
-
         protected:
             void processScene(TiXmlElement *XMLRoot);
 

@@ -34,9 +34,6 @@
       <position x="-1.000000" y="1.500000" z="11.500000"/>
       <quaternion x="0.000000" y="0.000000" z="-0.000000" w="1.000000"/>
       <scale x="0.485423" y="0.485423" z="0.485423"/>
-      <entity name="player" meshFile="player.mesh">
-        <physics shape="sphere" mass="100"/>
-      </entity>
     </node>
     <node name="Lamp">
       <position x="7.424817" y="7.000000" z="-13.924138"/>

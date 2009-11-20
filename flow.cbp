@@ -84,11 +84,11 @@
 		<Unit filename="btogre\BtOgreExtras.hpp" />
 		<Unit filename="btogre\BtOgreGP.hpp" />
 		<Unit filename="btogre\BtOgrePG.hpp" />
-		<Unit filename="btogre\BtOgreSoftBody.cpp">
-			<Option compile="0" />
-			<Option link="0" />
+		<Unit filename="btogre\BtOgreSoftBody.cpp" />
+		<Unit filename="btogre\BtOgreSoftBody.hpp">
+			<Option compile="1" />
+			<Option link="1" />
 		</Unit>
-		<Unit filename="btogre\BtOgreSoftBody.hpp" />
 		<Unit filename="framework\AdvancedOgreFramework.cpp" />
 		<Unit filename="framework\AdvancedOgreFramework.hpp" />
 		<Unit filename="framework\AppState.hpp" />

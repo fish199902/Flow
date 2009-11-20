@@ -23,6 +23,8 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+#include "../btorge/BtOgreSoftBody.hpp"
+
 #include "../framework/AppState.hpp"
 
 #include "../framework/DotSceneLoader.hpp"
@@ -102,15 +104,16 @@ class GameState : public AppState
         CEGUI::Window*              m_pMainWnd;
         //CEGUI::Window*                m_pChatWnd;
 
-        btDiscreteDynamicsWorld*                physicsWorld;
-        btSequentialImpulseConstraintSolver*    solver;
-        btCollisionDispatcher*                  dispatcher;
-        btDefaultCollisionConfiguration*        collisionConfiguration;
-        btAxisSweep3*                           broadphase;
+        btSoftRigidDynamicsWorld*                   physicsWorld;
+        btSequentialImpulseConstraintSolver*        solver;
+        btCollisionDispatcher*                      dispatcher;
+        btSoftBodyRigidBodyCollisionConfiguration*  collisionConfiguration;
+        btAxisSweep3*                               broadphase;
+        btSoftBodyWorldInfo                         m_SoftBodyWorldInfo;
 
-        BtOgre::DebugDrawer*                    physicsDebug;
+        BtOgre::DebugDrawer*                        physicsDebug;
 
-        btRigidBody*                            m_pPlayerPhysics;
+        btSoftBody*                                 m_pPlayerPhysics;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

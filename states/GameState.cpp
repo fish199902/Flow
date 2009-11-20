@@ -94,10 +94,12 @@ void GameState::enter()
     // Sweep and prune broadphase
     /// \todo use the collision dispatcher to register a callback that filters overlapping broadphase proxies so that the collisions are not processed by the rest of the system.
     broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
+    softBodyWorldInfo.m_broadphase = broadphase;
 
     // Collision configuration is used to fine tune the algorithms used for the full collision detection
-    collisionConfiguration = new btDefaultCollisionConfiguration();
+    collisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
     dispatcher = new btCollisionDispatcher(collisionConfiguration);
+    softBodyWorldInfo.m_dispatcher = dispatcher;
 
     // Solver determines how object interact
     solver = new btSequentialImpulseConstraintSolver;
@@ -106,6 +108,7 @@ void GameState::enter()
 
     // Set Y axis to 'up', this should match ogre.
     physicsWorld->setGravity(btVector3(GRAVITY_ACCELERATION));
+    softBodyWorldInfo.m_gravity.setValue(GRAVITY_ACCELERATION);
 
     // btOgre Stuff
     physicsDebug = new BtOgre::DebugDrawer(m_pSceneMgr->getRootSceneNode(), physicsWorld);
@@ -178,16 +181,19 @@ void GameState::createScene()
     Ogre::DotSceneLoader* pDotSceneLoader = new Ogre::DotSceneLoader();
     pDotSceneLoader->parseDotScene(m_LevelName + ".xml", "General", m_pSceneMgr, physicsWorld, m_pSceneMgr->getRootSceneNode());
 
-    m_pPlayerPhysics = pDotSceneLoader->playerRigidBody;
-    if (!m_pPlayerPhysics)
-    {
-        OgreFramework::getSingletonPtr()->m_pLog->logMessage("Error, no player found in level");
-    }
-    else {
-        m_pCamera->setAutoTracking(true, m_pSceneMgr->getSceneNode("player"));
+    createPlayer();
+}
 
-        OgreFramework::getSingletonPtr()->m_pLog->logMessage("Finished loading level");
-    }
+void GameState::createPlayer()
+{
+    Ogre::SceneNode *playerNode = m_pSceneManager->getSceneNode("player");
+
+    MeshManager::getSingletonPtr()->load("player.mesh", "default");
+    Ogre::Entity *playerEntity = m_pSceneManager->createEntity("player", "player.mesh");
+
+    BtOgre::StaticMeshToSoftBodyConverter converter(softBodyWorldInfo, playerEntity);
+
+    m_pPlayerPhysics = converter.createSoftBodyFromTrimesh();
 }
 
 bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
