@@ -23,7 +23,7 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "../btorge/BtOgreSoftBody.hpp"
+#include "../btogre\BtOgreSoftBody.hpp"
 
 #include "../framework/AppState.hpp"
 
@@ -58,6 +58,7 @@ class GameState : public AppState
 
         void enter();
         void createScene();
+        void createPlayer();
         void exit();
         bool pause(); //{return true;}
         void resume(); //{};

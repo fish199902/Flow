@@ -94,21 +94,21 @@ void GameState::enter()
     // Sweep and prune broadphase
     /// \todo use the collision dispatcher to register a callback that filters overlapping broadphase proxies so that the collisions are not processed by the rest of the system.
     broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
-    softBodyWorldInfo.m_broadphase = broadphase;
+    m_SoftBodyWorldInfo.m_broadphase = broadphase;
 
     // Collision configuration is used to fine tune the algorithms used for the full collision detection
     collisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
     dispatcher = new btCollisionDispatcher(collisionConfiguration);
-    softBodyWorldInfo.m_dispatcher = dispatcher;
+    m_SoftBodyWorldInfo.m_dispatcher = dispatcher;
 
     // Solver determines how object interact
     solver = new btSequentialImpulseConstraintSolver;
 
-    physicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+    physicsWorld = new btSoftRigidDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
     // Set Y axis to 'up', this should match ogre.
     physicsWorld->setGravity(btVector3(GRAVITY_ACCELERATION));
-    softBodyWorldInfo.m_gravity.setValue(GRAVITY_ACCELERATION);
+    m_SoftBodyWorldInfo.m_gravity.setValue(GRAVITY_ACCELERATION);
 
     // btOgre Stuff
     physicsDebug = new BtOgre::DebugDrawer(m_pSceneMgr->getRootSceneNode(), physicsWorld);
@@ -186,14 +186,19 @@ void GameState::createScene()
 
 void GameState::createPlayer()
 {
-    Ogre::SceneNode *playerNode = m_pSceneManager->getSceneNode("player");
+    LogManager::getSingleton().logMessage("Creating player");
+
+    Ogre::SceneNode *playerNode = m_pSceneMgr->getSceneNode("player");
 
     MeshManager::getSingletonPtr()->load("player.mesh", "default");
-    Ogre::Entity *playerEntity = m_pSceneManager->createEntity("player", "player.mesh");
+    Ogre::Entity *playerEntity = m_pSceneMgr->createEntity("player", "player.mesh");
 
-    BtOgre::StaticMeshToSoftBodyConverter converter(softBodyWorldInfo, playerEntity);
+    BtOgre::StaticMeshToSoftBodyConverter converter(&m_SoftBodyWorldInfo, playerEntity);
 
     m_pPlayerPhysics = converter.createSoftBodyFromTrimesh();
+    physicsWorld->addSoftBody(m_pPlayerPhysics);
+
+    //body->setActivationState(DISABLE_DEACTIVATION);
 }
 
 bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
@@ -370,10 +375,15 @@ void GameState::getInput()
 void GameState::movePlayer()
 {
     /// \todo Make the player motion relative to the camera.
+    // Old code (before softbody:
     //m_ImpulseVector = m_ImpulseVector * m_pCamera->getWorldPosition();
 
     // Convert m_ImpulseVector to a btVector3 and pass it to bullet
-    m_pPlayerPhysics->applyCentralImpulse(btVector3(m_ImpulseVector.x, m_ImpulseVector.y, m_ImpulseVector.z));
+    //m_pPlayerPhysics->applyCentralImpulse(btVector3(m_ImpulseVector.x, m_ImpulseVector.y, m_ImpulseVector.z));
+
+    // Updated for softbody
+    /// \todo Make this more realistic
+    m_pPlayerPhysics->setVelocity(btVector3(m_ImpulseVector.x, m_ImpulseVector.y, m_ImpulseVector.z));
 }
 
 /**

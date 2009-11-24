@@ -26,6 +26,8 @@
 #include <vector>
 #include <sstream>
 
+#include "../btogre/BtOgreSoftBody.hpp"
+
 #include "../btogre/BtOgreExtras.hpp"
 #include "../btogre/BtOgreGP.hpp"
 #include "../btogre/BtOgrePG.hpp"
@@ -57,7 +59,7 @@ namespace Ogre
             DotSceneLoader() : mSceneMgr(0) {}
             virtual ~DotSceneLoader() {}
 
-            void parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, btDiscreteDynamicsWorld *physWorld, SceneNode *pAttachNode = NULL, const String &sPrependNode = "");
+            void parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, btSoftRigidDynamicsWorld *physWorld, SceneNode *pAttachNode = NULL, const String &sPrependNode = "");
             String getProperty(const String &ndNm, const String &prop);
 
             std::vector<nodeProperty>   nodeProperties;
@@ -109,7 +111,7 @@ namespace Ogre
             String m_sGroupName;
             String m_sPrependNode;
 
-            btDiscreteDynamicsWorld     *physicsWorld;
+            btSoftRigidDynamicsWorld     *physicsWorld;
     };
 }
 

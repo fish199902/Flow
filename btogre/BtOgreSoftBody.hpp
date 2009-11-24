@@ -38,8 +38,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BtOgreSoftBody_H__
-#define __BtOgreSoftBody_H__
+#ifndef BT_OGRE_SOFT_BODY_HPP
+#define BT_OGRE_SOFT_BODY_HPP
 
 #include "Ogre.h"
 #include "btBulletDynamicsCommon.h"

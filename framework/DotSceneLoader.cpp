@@ -23,7 +23,7 @@
 using namespace std;
 using namespace Ogre;
 
-void DotSceneLoader::parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, btDiscreteDynamicsWorld *physWorld, SceneNode *pAttachNode, const String &sPrependNode)
+void DotSceneLoader::parseDotScene(const String &SceneName, const String &groupName, SceneManager *yourSceneMgr, btSoftRigidDynamicsWorld *physWorld, SceneNode *pAttachNode, const String &sPrependNode)
 {
     // set up shared object values
     m_sGroupName = groupName;
@@ -720,11 +720,22 @@ void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity, Scen
 {
     BtOgre::StaticMeshToShapeConverter converter(pEntity);
 
+    btScalar mass;
+
+    String massString = getAttrib(XMLNode, "mass");
+
+    if (mass)
+    {
+        istringstream massStream(massString);
+        massStream >> mass;
+    }
+    else
+        mass = 0;
+
     /// \todo Check for memory leaks, and make sure things created here are fixed in place
 
-    btCollisionShape* shape;
-    btScalar mass;
     String shapeType = getAttrib(XMLNode, "shape");
+    btCollisionShape* shape;
 
     if (shapeType == "box")
         shape = converter.createBox();
@@ -738,16 +749,6 @@ void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity, Scen
     else
         shape = converter.createTrimesh();
 
-    String massString = getAttrib(XMLNode, "mass");
-
-    if (mass)
-    {
-        istringstream massStream(massString);
-        massStream >> mass;
-    }
-    else
-        mass = 0;
-
     // Conect Ogre to Bullet
     btVector3 intertia;
     shape->calculateLocalInertia(mass, intertia);
@@ -758,15 +759,6 @@ void DotSceneLoader::processPhysics(TiXmlElement *XMLNode, Entity *pEntity, Scen
 
     btRigidBody* body = new btRigidBody(mass, groundState, shape, btVector3(0, 0, 0));
     physicsWorld->addRigidBody(body);
-
-    /// \todo This might need to add other nodes than just the player (To allow manipulating other objects).
-    if (pNode->getName() == "player")
-    {
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Added player node.");
-        playerRigidBody = body;
-
-        body->setActivationState(DISABLE_DEACTIVATION);
-    }
 }
 
 void DotSceneLoader::processParticleSystem(TiXmlElement *XMLNode, SceneNode *pParent)
